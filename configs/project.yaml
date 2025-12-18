@@ -1,0 +1,9 @@
+project:
+  name: scholarly-research-assistant
+  environment: local
+  seed: 42
+  
+paths:
+  data_root: ./data
+  model_root: ./models
+  log_root: ./logs 

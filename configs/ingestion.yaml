@@ -1,0 +1,12 @@
+sources: 
+  arxiv: 
+    enabled: true
+    max_papers: 1000
+    
+  pubmed:
+    enabled: true
+    max_papers: 1000
+  
+storage:
+  raw_pdf_dir: data/raw/pdfs
+  metadata_pdf_dir: data/raw/metadata
