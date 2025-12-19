@@ -1,7 +1,9 @@
 sources: 
   arxiv: 
     enabled: true
-    max_papers: 1000
+    categories: ["cs.AI", "cs.CY"]
+    # max_papers: 1000
+    max_papers: 10
     
   pubmed:
     enabled: true

@@ -47,3 +47,6 @@ dist/
 .coverage
 htmlcov/
 .pytest_cache/
+
+setup.ps1
+requirements.txt
