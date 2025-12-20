@@ -32,6 +32,11 @@ logs/*
 #----MLFlow----
 mlruns/
 
+#----Data----
+data/evaluation
+data/processed
+data/raw
+
 #----Notebooks----
 .ipynb_checkpoints/
 
@@ -48,5 +53,8 @@ dist/
 htmlcov/
 .pytest_cache/
 
+#----Testing----
 setup.ps1
 requirements.txt
+
+data_view.py

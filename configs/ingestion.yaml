@@ -2,12 +2,13 @@ sources:
   arxiv: 
     enabled: true
     categories: ["cs.AI", "cs.CY"]
-    # max_papers: 1000
-    max_papers: 10
+    # max_papers: 1000 
+    max_papers: 25
     
   pubmed:
     enabled: true
-    max_papers: 1000
+    # max_papers: 1000
+    max_papers: 25
   
 storage:
   raw_pdf_dir: data/raw/pdfs
