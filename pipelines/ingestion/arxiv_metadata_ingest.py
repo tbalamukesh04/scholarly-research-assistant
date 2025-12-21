@@ -7,26 +7,14 @@ from pathlib import Path
 from typing import List
 
 import feedparser
-import yaml
 
 from utils.logging import log_event, setup_logger
+from utils.helper_functions import load_yaml
 
 
 # ------------------------------------------------------------
 # ---------------------Utility Functions----------------------
 # ------------------------------------------------------------
-def load_yaml(path: str) -> dict:
-    """
-    Load the yaml file present at path into a dictionary
-
-    Args:
-        path (str): yaml file source path
-
-    returns:
-        dict: contents of yaml file as a dictionary
-    """
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
 
 
 def compute_paper_id(source: str, source_id: str) -> str:
@@ -50,6 +38,9 @@ def compute_paper_id(source: str, source_id: str) -> str:
 
 
 def ingest_arxiv_metadata():
+    """
+    Ingests metadata from arxiv.org and stores it in a local directory.
+    """
     project_cfg = load_yaml("configs/project.yaml")
     ingestion_cfg = load_yaml("configs/ingestion.yaml")
 
