@@ -5,11 +5,12 @@ sources:
     # max_papers: 1000 
     max_papers: 25
     
-  pubmed:
+  pmc:
     enabled: true
     # max_papers: 1000
-    max_papers: 25
+    max_papers: 5
+    sleep_records : 0.5
   
 storage:
   raw_pdf_dir: data/raw/pdfs
-  metadata_pdf_dir: data/raw/metadata
+  metadata_dir: data/raw/metadata

@@ -9,27 +9,7 @@ from typing import List
 import feedparser
 
 from utils.logging import log_event, setup_logger
-from utils.helper_functions import load_yaml
-
-
-# ------------------------------------------------------------
-# ---------------------Utility Functions----------------------
-# ------------------------------------------------------------
-
-
-def compute_paper_id(source: str, source_id: str) -> str:
-    """
-    Computes Unique SHA-256 Hash for each file, serving as a paper_id
-
-    Args:
-        source (str): Source publication of the paper
-        source_id (str): Entry id of paper according to publication website
-
-    returns:
-        str: A hash for according to content
-    """
-    raw = f"{source} :: {source_id}".encode("utf-8")
-    return hashlib.sha256(raw).hexdigest()
+from utils.helper_functions import load_yaml, compute_paper_id
 
 
 # ------------------------------------------------------------
@@ -45,7 +25,7 @@ def ingest_arxiv_metadata():
     ingestion_cfg = load_yaml("configs/ingestion.yaml")
 
     log_dir = project_cfg["paths"]["log_root"]
-    metadata_dir = Path(ingestion_cfg["storage"]["metadata_pdf_dir"])
+    metadata_dir = Path(ingestion_cfg["storage"]["metadata_dir"])
     metadata_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logger(name="arxiv_ingestion", log_dir=log_dir, level=logging.INFO)
@@ -110,7 +90,7 @@ def ingest_arxiv_metadata():
             "paper_id": paper_id,
             "source": "arxiv",
             "source_id": str(source_id),
-            "doi": str(entry.get("arxiv_doi")) if entry.get("arxiv.doi") else None, 
+            "doi": str(entry.get("arxiv_doi")) if entry.get("arxiv_doi") else None, 
             "title": str(entry.title).strip(),
             "authors": [str(a.name) for a in entry.authors],
             "abstract": str(entry.summary).strip(),

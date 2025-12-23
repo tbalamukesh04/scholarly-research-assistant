@@ -35,7 +35,8 @@ def sha256_file(path: Path) -> str:
 
 def acquire_arxiv_pdfs():
     '''
-    Performs the pdf downloading process and stores.'''
+    Performs the pdf downloading process and stores.
+    '''
     project_cfg = load_yaml("configs/project.yaml")
     ingestion_cfg = load_yaml("configs/ingestion.yaml")
     
@@ -89,6 +90,9 @@ def acquire_arxiv_pdfs():
         try:
             response = requests.get(pdf_url, timeout=30)
             response.raise_for_status()
+            content_type = response.headers.get("Content-Type", "")
+            if "pdf" not in content_type.lower():
+                raise ValueError(f"Non-pdf Content: {content_type}")
             
             pdf_path.write_bytes(response.content)
             
@@ -97,8 +101,11 @@ def acquire_arxiv_pdfs():
             record["checksum"] = checksum
             record["pdf_acquired_at"] = datetime.now(timezone.utc).isoformat()
             
-            with metapath.open("w", encoding="utf-8") as f:
+            tmp_path = metapath.with_suffix(".json.tmp")
+            with tmp_path.open("w", encoding="utf-8") as f:
                 json.dump(record, f, indent=2)
+                
+            tmp_path.replace(metapath)
                 
             downloaded += 1
             
