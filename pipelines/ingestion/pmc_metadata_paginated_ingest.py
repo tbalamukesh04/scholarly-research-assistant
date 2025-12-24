@@ -10,6 +10,9 @@ from utils.logging import setup_logger, log_event
 from utils.helper_functions import load_yaml, compute_paper_id
 
 def ingest_pmc_metadata_paginated():
+    '''
+    Ingest Metadata from Paginated Pubmed Central
+    '''
     project_cfg = load_yaml("configs/project.yaml")
     ingestion_cfg = load_yaml("configs/ingestion.yaml")
     
