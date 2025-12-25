@@ -1,6 +1,7 @@
 import yaml
 import hashlib
 import json
+import numpy as np
 from pathlib import Path
 
 # ------------------------------------------------------------
@@ -34,4 +35,14 @@ def load_yaml(path: str) -> dict:
     with open(path, "r") as f:
         return yaml.safe_load(f)
         
+def normalize(x: np.ndarray) -> np.ndarray:
+    '''
+    Normalize text
+    Args:
+        x (np.ndarray): Text to be normalized
         
+    Returns:
+        np.ndarray: normalized text
+    '''
+    n = np.linalg.norm(x, axis=1, keepdims=True)
+    return x / np.clip(n, 1e-12, None)
