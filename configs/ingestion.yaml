@@ -3,7 +3,7 @@ sources:
     enabled: true
     categories: ["cs.AI", "cs.CY"]
     # max_papers: 1000 
-    max_papers: 25
+    max_papers: 5
     
   pmc:
     enabled: true

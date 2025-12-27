@@ -14,7 +14,7 @@ OUT_DIR = Path("data/processed/faiss")
 INDEX_PATH = OUT_DIR / "index.faiss"
 META_PATH = OUT_DIR / "index_meta.json"
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 
 def load_chunks():
     texts = []

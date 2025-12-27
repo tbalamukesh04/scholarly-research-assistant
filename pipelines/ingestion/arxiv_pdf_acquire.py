@@ -41,9 +41,8 @@ def acquire_arxiv_pdfs():
     ingestion_cfg = load_yaml("configs/ingestion.yaml")
     
     log_dir = project_cfg["paths"]["log_root"]
-    metadata_dir = Path(ingestion_cfg["storage"]["metadata_pdf_dir"])
+    metadata_dir = Path(ingestion_cfg["storage"]["metadata_dir"])
     pdf_dir = Path(ingestion_cfg["storage"]["raw_pdf_dir"])
-    
     pdf_dir.mkdir(parents=True, exist_ok=True)
     logger = setup_logger(
         name="arxiv_pdf_acquisition", 

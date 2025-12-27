@@ -103,14 +103,14 @@ def extract_and_chunk():
             chunks = []
             for idx, chunk in enumerate(chunk_text(joined)):
                 chunks.append({
-                    "chunk_id": sha256_words(chunk),
+                    "chunk_id": f"{paper_id}::sec::{sec}::chunk::{idx}",
                     "text": chunk,
                     "order": idx, 
                     "token_est": len(chunk.split()) 
                 })
                 
             structured["sections"].append({
-                "section": sec, 
+                "section": sec.lower(), 
                 "chunks": chunks
             })
         log_event(

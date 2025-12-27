@@ -11,7 +11,8 @@ Log Structure:
     level
     module
     message
-    optional metadata(dict)"""
+    optional metadata(dict)
+"""
 
 import json
 import logging
