@@ -6,6 +6,13 @@ CHUNKS_DIR = Path("data/processed/chunks")
 def norm(s: str):
     return (s or "").strip().lower()
 def attach_text(retrieval_output: dict) -> dict:
+    '''
+    Attaches the text of the retrieved documents to the retrieval output.
+    Args:
+        retrieval_output (dict): The retrieval output.
+    Returns:
+        dict: The retrieval output with the text attached.
+    '''
     cache = {}
     
     for r in  retrieval_output["results"]:

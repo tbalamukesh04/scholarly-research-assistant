@@ -12,6 +12,13 @@ class LLM:
         self.client = genai.Client(api_key = os.environ["GEMINI_API_KEY"])
         
     def generate(self, prompt: str) -> str:
+        '''
+        Generates a response to the given prompt using the Gemini API.
+        Args:
+            prompt (str): The prompt to generate a response for.
+        Returns:
+            str: The generated response.
+        '''
         response = self.client.models.generate_content(
             model = "gemini-2.5-flash-lite",
             contents = prompt, 
@@ -23,6 +30,13 @@ class LLM:
         return response.text.strip()
         
 def format_evidence(evidence: List[dict]) -> str:
+    '''
+    Formats the evidence into a readable string.
+    Args:
+        evidence (List[dict]): The evidence to format.
+    Returns:
+        str: The formatted evidence.
+    '''
     blocks = []
     for e in evidence:
         blocks.append(
@@ -31,6 +45,15 @@ def format_evidence(evidence: List[dict]) -> str:
     return f"\n\n".join(blocks)
     
 def answer(query: str, top_k: int=8, k_min: int=3):
+    '''
+    Answers the given query using the RAG pipeline.
+    Args:
+        query (str): The query to answer.
+        top_k (int): The number of responses to retrieve.
+        k_min (int): The minimum number of responses required to answer the query.
+    Returns:
+        dict: The answer and evidence.
+    '''
     logger = setup_logger(
         name = "rag_answer", 
         log_dir = "./logs", 
@@ -89,6 +112,6 @@ def answer(query: str, top_k: int=8, k_min: int=3):
     }
     
 if __name__ == "__main__":
-    query = "What are the different types of reasoning questions included in the EgoMAN dataset? "
+    query = "How does Pooling by Multihead Attention (PMA) differ from EOS and mean pooling for code embeddings?"
     results = answer(query, 20, 3)
     print(json.dumps(results, indent=2))

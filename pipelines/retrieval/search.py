@@ -40,7 +40,14 @@ class Retriever:
             vectors = self.index.ntotal
         )
         
-    def search(self, query: str):
+    def search(self, query: str)-> dict:
+        '''
+        Searches for relevant documents based on a query.
+        Args:
+            query (str): The query to search for.
+        Returns:
+            dict: A dictionary containing the query and the results.
+        '''
         q_emb = self.model.encode([query], normalize_embeddings=False)
         q_emb = normalize(np.asarray(q_emb).astype("float32"))
         
