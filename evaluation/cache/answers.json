@@ -1,0 +1,24 @@
+{
+  "q01::strict": {
+    "query": "What problem does C2LLM aim to solve in code retrieval systems?",
+    "answer": "I cannot answer this reliably with the available evidence.",
+    "citations": []
+  },
+  "q02::strict": {
+    "query": "How does Pooling by Multihead Attention (PMA) differ from EOS and mean pooling for code embeddings?",
+    "answer": "Pooling by Multihead Attention (PMA) differs from mean pooling and End-of-Sequence (EOS) representation in code embeddings because the cross-attention mechanism in PMA allows the model to learn which tokens are most salient for the final representation [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de]. In contrast, mean pooling often uses bidirectional attention, which deviates from the causal pretraining of many code LLMs, and EOS representation collapses all syntactic and semantic structure into a single token, creating an information bottleneck [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de]. PMA aggregates information from all tokens in the sequence, breaking the information bottleneck of EOS-based embeddings [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de]. Additionally, PMA supports flexible adaptation of the embedding dimension, serving as an alternative to MRL training [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de].",
+    "citations": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::1",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:unknown:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::41",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::0"
+    ]
+  },
+  "q03::strict": {
+    "query": "What backbone models are used to build the C2LLM family?",
+    "answer": "I cannot answer this with the information that I have at the moment.",
+    "evidence": 1,
+    "citations": []
+  }
+}

@@ -44,13 +44,14 @@ def format_evidence(evidence: List[dict]) -> str:
         )
     return f"\n\n".join(blocks)
     
-def answer(query: str, top_k: int=8, k_min: int=3):
+def answer(query: str, top_k: int=8, k_min: int=3, mode: str = "strict", retriever=None):
     '''
     Answers the given query using the RAG pipeline.
     Args:
         query (str): The query to answer.
         top_k (int): The number of responses to retrieve.
         k_min (int): The minimum number of responses required to answer the query.
+        mode (str): The mode of the answer. Can be "strict" or "loose".
     Returns:
         dict: The answer and evidence.
     '''
@@ -59,7 +60,8 @@ def answer(query: str, top_k: int=8, k_min: int=3):
         log_dir = "./logs", 
         level = logging.INFO
     )
-    retriever = Retriever(top_k=top_k)
+    if retriever is None:
+        retriever = Retriever(top_k=top_k)
     retrieved = retriever.search(query)
     
     from pipelines.retrieval.hydrate import attach_text
@@ -81,12 +83,27 @@ def answer(query: str, top_k: int=8, k_min: int=3):
             "evidence": len(evidence),
             "citations": []
         }
+    
+    if mode == "strict":
+        instruction = (
+            "Answer the question with ONLY using the evidence below."
+            "If the evidence is insufficient or contradictory, say so."
+            "Every Claim Must be cited."
+            
+        )
+    elif mode == "loose":
+        instruction = (
+            "Answer using the evidence below. "
+            "You may synthesize across sources, but you MUST label the answer as SYNTHESIS. "
+            "Every claim must be cited."
+        )
+    
         
     prompt = f'''
     You are a scholarly assistant.
-    Answer the question with ONLY using the evidence below.
-    Every claim must be cited.
-    If the evidence is insufficient or contradictory, say so.
+    Instruction:
+    {instruction}
+    
     Question:
     {query}
     
@@ -95,6 +112,8 @@ def answer(query: str, top_k: int=8, k_min: int=3):
     '''
     llm = LLM()
     response = llm.generate(prompt)
+    if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
+        response = "SYNTHESIS: " + response                                                 
     if "does not explicitly" in response.lower() or "does not list" in response.lower():
         return {
             "query": query,

@@ -58,4 +58,6 @@ setup.ps1
 requirements.txt
 
 data_view.py
-eval/queries.json
+evaluation/queries.json
+evaluation/queries1.json
+evaluation/results
