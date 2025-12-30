@@ -7,6 +7,12 @@ from rank_bm25 import BM25Okapi
 CHUNKS_DIR = Path("data/processed/chunks")
 
 def load_corpus():
+    '''
+    Load the corpus of documents and their metadata.
+    
+    Returns:
+        tuple: A tuple containing the list of documents and their metadata.
+    '''
     documents = []
     doc_meta = []
     
@@ -37,6 +43,16 @@ class BM25Retriever:
         self.meta = meta
     
     def search(self, query: str, k: int = 10) -> List[Dict]:
+        '''
+        Perform a BM25 search on the corpus.
+        
+        Args:
+            query (str): The search query.
+            k (int): The number of results to return.
+        
+        Returns:
+            list: A list of normalized results.
+        '''
         tokenized = query.lower().split()
         scores = self.bm25.get_scores(tokenized)
         
@@ -49,9 +65,13 @@ class BM25Retriever:
         results = []
         
         for idx, score in ranked:
-            r = self.meta[idx].copy()
-            r["score"] = float(score)
-            results.append(r)
+            meta = self.meta[idx]
+            
+            results.append({
+            "paper_id": meta["paper_id"], 
+            "chunk_id": meta["chunk_id"], 
+            "score": float(score)
+            })
             
         return results 
     

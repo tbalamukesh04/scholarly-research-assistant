@@ -73,7 +73,6 @@ class Retriever:
         ]
             
         return {
-            "query": query, 
             "results": results
         }
         

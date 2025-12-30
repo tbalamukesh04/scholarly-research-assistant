@@ -5,6 +5,16 @@ from typing_extensions import List, Dict
 from evaluation.baselines.bm25 import BM25Retriever
 
 def precision_and_recall_at_k(results: Dict, relevant_papers: List[str], k: int):
+    '''Calculate precision and recall at k for a given set of results and relevant papers.
+    
+    Args:
+        results (Dict): The search results.
+        relevant_papers (List[str]): The list of relevant papers.
+        k (int): The number of results to consider.
+        
+    Returns:
+        tuple: A tuple containing the precision and recall values.
+    '''
     if not relevant_papers:
         return 0.0
         
