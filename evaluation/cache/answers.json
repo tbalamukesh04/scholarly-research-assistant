@@ -20,5 +20,347 @@
     "answer": "I cannot answer this with the information that I have at the moment.",
     "evidence": 1,
     "citations": []
+  },
+  "q04::strict": {
+    "query": "How is embedding dimensionality adaptation achieved in C2LLM?",
+    "answer": "Embedding dimensionality adaptation in C2LLM is achieved by the Pooling by Multihead Attention (PMA) module. The PMA module can reduce the embedding dimension, serving as an alternative to MRL [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::0]. Specifically, the PMA module, which consists of a cross-attention layer with a single learnable query vector, takes the LLM's last hidden states as key and value. This process aggregates information from the token sequence into a single embedding vector and can simultaneously reduce the embedding dimension [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::0]. The PMA module decouples the LLM's hidden dimension from the final LLM embedding dimension, allowing for the production of compact embeddings suitable for vector databases [22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::1].",
+    "citations": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::1",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::3",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:references:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::references::chunk::0",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:abstract:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::abstract::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::1",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::2",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::6",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:references:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::references::chunk::1"
+    ]
+  },
+  "q05::strict": {
+    "query": "What training data scale is used for C2LLM and why is it sufficient?",
+    "answer": "I cannot answer this with the information that I have at the moment.",
+    "evidence": 0,
+    "citations": []
+  },
+  "q06::strict": {
+    "query": "How does C2LLM perform on the MTEB-Code benchmark compared to closed-source models?",
+    "answer": "I cannot answer this with the information that I have at the moment.",
+    "evidence": 2,
+    "citations": []
+  },
+  "q08::strict": {
+    "query": "What are scaling laws for economic productivity in LLM-assisted work?",
+    "answer": "Scaling laws for economic productivity in LLM-assisted work suggest that each year of model progress can reduce task completion times by approximately 8%, with 56% of these gains attributed to increased compute and 44% to algorithmic progress [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::0]. These productivity gains are significantly larger for non-agentic analytical tasks compared to agentic workflows that require tool use [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::0].\n\nSpecifically, for non-agentic tasks, there is an estimated reduction of approximately 10.7% in time per year, and an increase of about $20.40 per hour in earnings per minute [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::0]. For agentic tasks, the reduction in time per year is approximately 4.8%, with an increase of about $4.80 per hour in earnings per minute [173b0e88ded15",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:unknown:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::unknown::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::12",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::14",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::17",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::7"
+    ]
+  },
+  "q09::strict": {
+    "query": "How does increased training compute translate into task completion time reduction?",
+    "answer": "Increased training compute translates into task completion time reduction through a scaling law where a tenfold (10x) increase in model training compute is associated with a 6.3% reduction in time taken [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::2]. Specifically, a 10x increase in training compute corresponds to approximately a 6% reduction in task completion time (p < 0.31) [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::2]. This \"compute progress\" contributes to productivity gains by reducing the time required to complete tasks [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1]. Raw scale, or training compute, contributes a 4.8% reduction in task time annually [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::16",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::18",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::15"
+    ]
+  },
+  "q10::strict": {
+    "query": "What is the relative contribution of compute scaling versus algorithmic progress?",
+    "answer": "The relative contribution of compute scaling versus algorithmic progress to productivity gains is approximately 56% for compute scaling and 44% for algorithmic advancements [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3]. Another decomposition suggests that roughly 58% of efficiency improvements are attributable to the scaling of raw compute, while the remaining 42% stem from algorithmic innovations and software optimization [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11]. However, there is some uncertainty in the exact split between these factors, as the specific contribution of compute is estimated with less precision (p \u2248 0.31) compared to the aggregate time trend (p < 0.05) [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3].",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::15",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::7",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::12",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::5"
+    ]
+  },
+  "q11::strict": {
+    "query": "How do productivity gains differ between agentic and non-agentic tasks?",
+    "answer": "Productivity gains differ between agentic and non-agentic tasks, with non-agentic tasks experiencing significantly larger benefits from AI assistance [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::12, 173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11].\n\nSpecifically, for Total Earnings Per Minute (TEPM), AI increases earnings by $1.58 per minute on non-agentic tasks (p < 0.001), compared to only $0.34 per minute on agentic tasks (p = 0.46). The difference between these effects is statistically significant at the 5% level (p = 0.043) [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::13].\n\nIn terms of Earnings Per Minute (EPM), AI usage results in an increase of $0.83 per minute on non-agentic tasks [173b0e88ded15dc1",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::13",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::8",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::18",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::12",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::5"
+    ]
+  },
+  "q12::strict": {
+    "query": "What experimental design was used to measure human-AI productivity?",
+    "answer": "The experimental design used to measure human-AI productivity involved comparing three distinct modes of production: humans working alone, humans working with AI assistance, and the raw output of AI models themselves [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::4]. This design allowed for a clean comparison of the impact of AI assistance on worker productivity and output quality across different professions [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::9]. The study also focused on non-agentic tasks for analyzing output quality [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3]. Participants were restricted to standard chatbot interfaces with text-based input and output and limited tool access, which may underestimate AI capabilities, particularly for agentic tasks [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::4",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::13",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::4",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::5",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::7"
+    ]
+  },
+  "q13::strict": {
+    "query": "Why does human-assisted output quality stagnate across model generations?",
+    "answer": "Human-assisted output quality stagnates across model generations because human users effectively cap the realized capabilities of frontier models, satisfying to a fixed quality threshold rather than maximizing the tool\u2019s potential [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::abstract::chunk::3]. For weaker models, human intervention is additive, but for the strongest models, human intervention appears to be destructive, actively degrading the output and bringing the final grade down [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::results::chunk::6]. Humans are only able to improve model outputs that are slightly better than their own [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::results::chunk::6]. For intermediate models, humans are unable to add to output quality, and for the best models, humans regress the output towards their own quality levels [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::results::chunk::6]. This leads to a situation where scaling laws for realized quality are broken by the human user, with users reverting to a regression to the mean regardless of the sophistication of the tool [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::results::chunk::7]. The scaling law for quality completely disappears when a human is in the loop, and the final output quality remains stagnant at approximately 4.3 points [173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::6",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::7",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::5",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::14",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::2"
+    ]
+  },
+  "q15::strict": {
+    "query": "What are the three types of noise identified in LLM evaluations?",
+    "answer": "The three types of noise identified in LLM evaluations are: prediction noise, data noise, and total noise [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::0].",
+    "citations": [
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:unknown:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::unknown::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:unknown:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::unknown::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::1",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:conclusion:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::conclusion::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::14",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:references:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::references::chunk::1",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:results:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::2"
+    ]
+  },
+  "q07::strict": {
+    "query": "How can C2LLM be deployed as a production code search engine?",
+    "answer": "I cannot answer this with the information that I have at the moment.",
+    "evidence": 1,
+    "citations": []
+  },
+  "q14::strict": {
+    "query": "How should governments regulate AI-driven productivity gains?",
+    "answer": "The provided evidence does not contain information on how governments should regulate AI-driven productivity gains. The evidence focuses on quantifying the productivity gains from AI and decomposing the drivers of this progress.",
+    "citations": [
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::11",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::4",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::6",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::5",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::9",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::9"
+    ]
+  },
+  "q16::strict": {
+    "query": "How does prediction noise differ from data noise in LLM benchmarks?",
+    "answer": "Prediction noise in LLM benchmarks arises from a model generating different answers to the same question, whereas data noise stems from sampling questions [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::0, a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::0]. Prediction noise is also referred to as prediction variance, which is due to the model generating different answers for a fixed question [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::0]. Data noise, or data variance, measures how questions vary in difficulty and thus in their expected metrics [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d32",
+    "citations": [
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:unknown:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::unknown::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::0",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::14",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::0"
+    ]
+  },
+  "q17::strict": {
+    "query": "What is the law of total variance and how is it applied to LLM evals?",
+    "answer": "The law of total variance states that for a random variable $A$, the total variance can be decomposed into the variance of the conditional expectation and the expectation of the conditional variance: $\\text{Var}[A] = \\text{Var}[\\mathbb{E}[A]] + \\mathbb{E}[\\text{Var}[A]]$ [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed].\n\nIn the context of LLM evaluations, this law is applied to understand and quantify different sources of noise in the evaluation process [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed]. Specifically, for a score $A(x, \\epsilon)$ where $x$ is a question and $\\epsilon$ represents noise or sampling, the total variance $\\text{Var}[A]$ can be broken down into:\n\n*   **Data Variance**: $\\text{Var}[\\mathbb{E}[A]]$ represents the variance due to the variability in the questions being asked. This is the variance of the expected score across different questions [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed].\n*   **Prediction Variance**: $\\mathbb{E}[\\text{Var}[A]]$ represents the variance arising from the model's own variability or sampling noise for a given question. This is the expected variance of the scores for a fixed question [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed].\n\nThis decomposition is useful for analyzing paired comparisons between two models, $A$ and $B$, where the law of total variance is applied to the difference $A-B$: $\\",
+    "citations": [
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::2",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::3",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:unknown:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::unknown::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:unknown:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::unknown::chunk::0"
+    ]
+  },
+  "q18::strict": {
+    "query": "Why does paired analysis reduce data noise in model comparisons?",
+    "answer": "Paired analysis reduces data noise in model comparisons by leveraging the correlation between model performances on the same questions. When comparing two models, A and B, the paired variance is calculated as Var[A(x) - B(x)] = Var[A] + Var[B] - 2Cov[A(x), B(x)] [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1]. The covariance term, Cov[A(x), B(x)], can significantly reduce the paired variance, especially when models A and B are highly correlated in their performance on the same questions [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1]. This reduction in variance, or noise, increases statistical power, allowing for the detection of smaller effects [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8",
+    "citations": [
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:abstract:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::abstract::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:references:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::references::chunk::1",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1"
+    ]
+  },
+  "q19::strict": {
+    "query": "What is the all-pairs paired method proposed for LLM evaluation?",
+    "answer": "The all-pairs paired method proposed for LLM evaluation involves comparing every possible pair of models on the same set of evaluation questions [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1]. This method aims to increase statistical power by accounting for the correlation between model predictions on the same question [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1]. The paired variance is calculated as Var[A(x) - B(x)] = Var[A(x)] + Var[B(x)] - 2Cov[A(x), B(x)], where the covariance term can reduce the paired variance if the models are correlated [a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1]. This approach allows for the detection of smaller differences between models",
+    "citations": [
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:methods:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::1",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::2",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:references:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::references::chunk::0",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:unknown:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::unknown::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::38",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::37",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:references:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::references::chunk::1",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:conclusion:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::conclusion::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::35",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:results:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::results::chunk::3"
+    ]
+  },
+  "q20::strict": {
+    "query": "How can averaging reduce prediction noise without changing the mean?",
+    "answer": "The provided evidence does not explain how averaging can reduce prediction noise without changing the mean.",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::10",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::7",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::31",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0"
+    ]
+  },
+  "q22::strict": {
+    "query": "What challenges arise when merging fine-tuned models trained on heterogeneous tasks?",
+    "answer": "Merging fine-tuned models trained on heterogeneous tasks presents challenges due to the fundamental mismatch between the diverse data distributions they were trained on [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0]. This heterogeneity can lead to brittle performance and high sensitivity to scaling initialization when current methods rely on heuristics to approximate optimal parameter combinations [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0]. Furthermore, these approaches do not explicitly account for the heterogeneity across tasks [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::4]. The merging process typically forbids access to the original training data [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0].",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::5",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::8",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::4",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::11",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::10",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::20",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::6"
+    ]
+  },
+  "q23::strict": {
+    "query": "What is the cross-task heterogeneity term introduced in the PAC-Bayes bound?",
+    "answer": "The cross-task heterogeneity term, denoted as $H_Q(\\alpha, \\beta)$, measures how much worse a fine-tuned model $Q_j$ performs on dataset $D_i$ compared to its own domain $D_j$. This term becomes zero if the datasets $D_i$ and $D_j$ are identical or if $Q_i \\equiv Q_j$ for all $j$, which is the case in a jointly trained multi-task learning model [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::13]. This term is also described as capturing \"transfer mismatch across tasks\" [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::15].",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::18",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::13",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::14",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::17",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::26",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::10",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::15",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::22",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::23",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::21"
+    ]
+  },
+  "q24::strict": {
+    "query": "How does SAMerging use Sharpness-Aware Minimization during merging?",
+    "answer": "SAMerging integrates Sharpness-Aware Minimization (SAM) to explicitly navigate towards flat loss basins [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::25]. This is motivated by the PAC-Bayes generalization bound, which suggests that favoring flatter basins, for example via sharpness-aware perturbations, can tighten the bound [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::19]. SAMerging uses SAM to stabilize adaptation and mitigate cross-task KL interference [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::28]. An ablation study showed that SAM, along with a KL objective, provides measurable gains, with their combination yielding the strongest improvements [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f7642",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::24",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::29",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::28",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::33",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::25",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::8",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::4",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::1",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::19",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::26"
+    ]
+  },
+  "q25::strict": {
+    "query": "Why is KL-divergence minimization suitable for multi-teacher knowledge distillation?",
+    "answer": "Minimizing the KL divergence between the student's (merged model) and the teachers' (fine-tuned models) distributions tightens a provable upper bound on the merged model's excess risk [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0]. This approach aligns with theoretical analysis and outperforms entropy-based merging criteria [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::5]. Specifically, minimizing the KL divergence directly tightens the proven risk bound for the merged model [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::23]. The objective achieves this by minimizing the student-teacher KL divergence on calibration data, thereby directly tightening the proven risk bound for the merged model [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae4",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:unknown:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::unknown::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::20",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::23",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::5",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::10",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::30",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::25",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::3"
+    ]
+  },
+  "q26::strict": {
+    "query": "How does flatness relate to generalization in merged models?",
+    "answer": "Flatness relates to generalization in merged models by contributing to better generalization and robustness [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9]. Specifically, flatter minima are linked to improved generalization and robustness [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::3, baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9]. In the context of multi-task learning (MTL), favoring flat basins can reduce cross-task sensitivity, enabling the merged model to generalize better [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c6",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::19",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::20",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::6",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::9",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::12",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::4",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::7",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::10",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::3"
+    ]
+  },
+  "q27::strict": {
+    "query": "What empirical evidence shows SAMerging outperforming AdaMerging?",
+    "answer": "The provided evidence does not contain information that shows SAMerging outperforming AdaMerging.",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::35",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::13",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::1",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::11",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::5",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::6",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:references:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::references::chunk::10",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:abstract:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::abstract::chunk::2",
+      "173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be:results:173b0e88ded15dc1359a15f73ccbbecf489e94db6d8a293ff290dac3e9dc89be::sec::results::chunk::0"
+    ]
+  },
+  "q29::strict": {
+    "query": "Why does decoding order matter in masked diffusion models?",
+    "answer": "Decoding order matters in masked diffusion models because it influences the model's cumulative predictive uncertainty along a generation path [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::2]. This uncertainty, quantified by Denoising Entropy, reflects how confident the model is throughout the generation process [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::2]. Different decoding strategies can lead to different expected uncertainties, and a single strategy can result in variance in path uncertainty [baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::2]. Furthermore, revealing additional context does not increase the prediction entropy, indicating that the decoding order influences the reduction of uncertainty [dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:unknown:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:references:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::references::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::13",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::14",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:results:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::0",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:abstract:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::12",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::1",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:references:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::8"
+    ]
+  },
+  "q30::strict": {
+    "query": "What is Path Uncertainty in the context of masked diffusion models?",
+    "answer": "Path Uncertainty in the context of masked diffusion models refers to the model's cumulative predictive uncertainty along a single decoding path [dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2]. It quantifies how confident the model is throughout the entire generation of a sequence [dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2]. This uncertainty is measured by Path Entropy, which is the integral of State Entropy across the entire decoding path [dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2].",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:unknown:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::13",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:abstract:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::5",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::14",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::9",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::11"
+    ]
   }
 }
