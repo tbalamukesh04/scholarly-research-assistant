@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from evaluation.hybrid.retriever import HybridRetriever
 from pipelines.retrieval.search import Retriever
 
 
@@ -37,7 +38,7 @@ def recall_at_k(results: List[Dict], relevant_papers: List[str], k: int) -> floa
     return hits / len(relevant_papers)
 
 
-def evaluate_retrieval(queries: List[Dict], retriever: Retriever, k: int = 10) -> Dict:
+def evaluate_retrieval(queries: List[Dict], retriever: Retriever|HybridRetriever, k: int = 10) -> Dict:
     '''
     Evaluates the retrieval performance of a given retriever.
     Args:
@@ -77,3 +78,4 @@ def evaluate_retrieval(queries: List[Dict], retriever: Retriever, k: int = 10) -
         "recall@k_mean": sum(recalls) / len(recalls),
         "per_query": per_query,
     }
+

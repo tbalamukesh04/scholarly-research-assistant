@@ -43,6 +43,20 @@ def format_evidence(evidence: List[dict]) -> str:
             f"[{e['paper_id']}:{e['section']}:{e['chunk_id']}]\n{e['text']}"
         )
     return f"\n\n".join(blocks)
+
+def adapt_for_rag(results, query):
+    return {
+        "query": query, 
+        "results": [
+            {
+            "paper_id": r["paper_id"],
+            "chunk_id": r["chunk_id"],
+            "section": r["chunk_id"].split("::")[1].split("::")[0],
+            "order": int(r["chunk_id"].split("::chunk::")[1]),
+            "text": None
+        } for r in results
+        ]
+    }
     
 def answer(query: str, top_k: int=8, k_min: int=3, mode: str = "strict", retriever=None):
     '''
@@ -62,11 +76,11 @@ def answer(query: str, top_k: int=8, k_min: int=3, mode: str = "strict", retriev
     )
     if retriever is None:
         retriever = Retriever(top_k=top_k)
-    retrieved = retriever.search(query)
+    raw = retriever.search(query)
     
     from pipelines.retrieval.hydrate import attach_text
+    retrieved = adapt_for_rag(raw, query)
     hydrated = attach_text(retrieved)
-    
     evidence = hydrated["results"]
     
     if len(evidence) < k_min:

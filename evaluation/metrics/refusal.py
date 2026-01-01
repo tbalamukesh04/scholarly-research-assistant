@@ -1,10 +1,11 @@
 import time
 from typing import Dict, List
 
+from evaluation.hybrid.retriever import HybridRetriever
 from pipelines.rag.answer import answer
 from pipelines.retrieval.search import Retriever
 
-def evaluate_refusals(queries: List[Dict], retriever: Retriever, cache: Dict) -> Dict:
+def evaluate_refusals(queries: List[Dict], retriever: Retriever|HybridRetriever, cache: Dict) -> Dict:
     '''
     Evaluates the refusal performance of a given retriever.
     Args:
