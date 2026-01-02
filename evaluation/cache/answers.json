@@ -362,5 +362,106 @@
       "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::9",
       "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:methods:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::11"
     ]
+  },
+  "q31::strict": {
+    "query": "How is State Entropy (hDE) computed during decoding?",
+    "answer": "The provided evidence does not contain information on how State Entropy (hDE) is computed during decoding.",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::4",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::18",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::6",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::14",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::references::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0"
+    ]
+  },
+  "q32::strict": {
+    "query": "How does Path Entropy (HDE) summarize uncertainty across a decoding path?",
+    "answer": "The provided evidence is insufficient to answer the question.",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::5",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::7",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::11",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::9",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::14",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::10"
+    ]
+  },
+  "q33::strict": {
+    "query": "What is the Entropy-based Best-of-N decoding strategy?",
+    "answer": "The provided evidence is insufficient to answer the question about the Entropy-based Best-of-N decoding strategy.",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::15",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::4",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::18",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::references::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::5",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::6"
+    ]
+  },
+  "q34::strict": {
+    "query": "How does entropy-guided Sequential Monte Carlo improve generation quality?",
+    "answer": "The provided evidence is insufficient to answer the question.",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::16",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::5",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::3",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::10",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::15",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::12"
+    ]
+  },
+  "q21::strict": {
+    "query": "How should leaderboard scores be recalibrated for public release?",
+    "answer": "I cannot answer this with the information that I have at the moment.",
+    "evidence": 0,
+    "citations": []
+  },
+  "q28::strict": {
+    "query": "How can SAMerging be adapted for continual learning systems?",
+    "answer": "The provided evidence is insufficient to answer the question.",
+    "citations": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::28",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed:sec:a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed::sec::methods::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::1",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::6",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::3",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::3",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::abstract::chunk::25",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:sec:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::references::chunk::1",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5:sec:baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5::sec::references::chunk::5",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de:sec:22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de::sec::references::chunk::0"
+    ]
+  },
+  "q35::strict": {
+    "query": "How can Denoising Entropy be applied to image diffusion models?",
+    "answer": "The provided evidence does not contain information on how Denoising Entropy can be applied to image diffusion models.",
+    "citations": [
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::unknown::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::2",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::references::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::14",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::10",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::abstract::chunk::5",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::11",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::results::chunk::0",
+      "dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755:sec:dd30b2ec51ab363075995220df06f5f47e22702dfe454fc9be20ebfcb580e755::sec::methods::chunk::7"
+    ]
   }
 }

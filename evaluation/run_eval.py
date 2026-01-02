@@ -37,30 +37,26 @@ def main():
 
     try:
         retrieval_metrics = evaluate_retrieval(
-            queries = queries,
-            retriever=shared_retriever, 
-            k=10
+            queries=queries, retriever=shared_retriever, k=10
         )
+
         citation_metrics = evaluate_citations(
-            queries = queries,
-            retriever = shared_retriever,
-            cache = ANSWER_CACHE
+            queries=queries, retriever=shared_retriever, cache=ANSWER_CACHE
         )
         refusal_metrics = evaluate_refusals(
-            queries = queries,
-            retriever = shared_retriever,
-            cache = ANSWER_CACHE
+            queries=queries, retriever=shared_retriever, cache=ANSWER_CACHE
         )
-    
+
         results = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "retrieval": retrieval_metrics,
             "citation": citation_metrics,
             "refusal": refusal_metrics,
         }
-    
+
         out_path = (
-            RESULTS_DIR / f"eval_run_{datetime.now(timezone.utc).strftime('%Y%m%d')}.json"
+            RESULTS_DIR
+            / f"eval_run_{datetime.now(timezone.utc).strftime('%Y%m%d')}.json"
         )
         with out_path.open("w", encoding="utf-8") as f:
             json.dump(results, f, indent=2)
@@ -69,10 +65,10 @@ def main():
         with CACHE_PATH.open("w", encoding="utf-8") as f:
             json.dump(ANSWER_CACHE, f, indent=2)
         raise e
-        
+
     with CACHE_PATH.open("w", encoding="utf-8") as f:
-            json.dump(ANSWER_CACHE, f, indent=2)
-                
+        json.dump(ANSWER_CACHE, f, indent=2)
+
     print("Evaluation completed.")
     print(json.dumps(results["retrieval"], indent=2))
 

@@ -1,7 +1,7 @@
 import json
 from evaluation.hybrid.retriever import HybridRetriever
 from evaluation.baselines.bm25 import BM25Retriever
-from evaluation.metrics.retrieval import recall_at_k, precision_at_k
+from evaluation.metrics_utils.retrieval import recall_at_k, precision_at_k
 from pipelines.retrieval.search import Retriever
 
 def main():

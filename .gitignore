@@ -14,7 +14,7 @@ env/
 Thumbs.db
 
 #----Data----
-data/*
+#data/*
 !data/.gitkeep
 !data/raw/
 !data/evaluation/
@@ -34,9 +34,7 @@ mlruns/
 .mlflow/
 
 #----Data----
-data/evaluation
-data/processed
-data/raw
+
 
 #----Notebooks----
 .ipynb_checkpoints/

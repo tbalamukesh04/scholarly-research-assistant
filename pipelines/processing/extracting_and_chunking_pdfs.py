@@ -82,6 +82,7 @@ def extract_and_chunk():
                             current_section = sec
                             continue
                         sections[current_section].append(line)
+                        
         except Exception as e:
             failed += 1
             log_event(
@@ -124,6 +125,7 @@ def extract_and_chunk():
         with out_path.open("w", encoding="utf-8") as f:
             json.dump(structured, f, indent=2)
             processed += 1
+            
     log_event(
         logger = logger, 
         level = logging.INFO, 
