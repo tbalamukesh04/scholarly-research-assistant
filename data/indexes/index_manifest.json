@@ -1,0 +1,9 @@
+{
+  "index_type": "faiss",
+  "embedding_model": "sentence-transformers/all-mpnet-base-v2",
+  "embedding_dim": 768,
+  "dataset_hash": "sha256:09a80bb4edc5a744d52ff4b265fee3bb31332d1af442301bffad096063425149",
+  "built_at": "2026-01-02T18:05:37.472334+00:00",
+  "faiss_index_file": "faiss.index",
+  "faiss_meta_file": "index_meta.json"
+}

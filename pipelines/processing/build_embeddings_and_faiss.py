@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 
 from utils.logging import setup_logger, log_event
 from utils.helper_functions import normalize
+from scripts.write_index_manifest import write_index_manifest
 
 CHUNKS_DIR = Path("data/processed/chunks")
 OUT_DIR = Path("data/processed/faiss")
@@ -74,6 +75,8 @@ def build():
     faiss.write_index(index, str(INDEX_PATH))
     with META_PATH.open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
+    
+    write_index_manifest()
     
     log_event(
         logger = logger, 
