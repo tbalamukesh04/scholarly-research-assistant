@@ -3,9 +3,12 @@ import logging
 import os
 from typing import List
 
+import mlflow
+
 from google import genai
 
 from pipelines.retrieval.search import Retriever
+from scripts.compute_dataset_hash import compute_dataset_hash
 from utils.logging import log_event, setup_logger
 
 
@@ -31,7 +34,13 @@ class LLM:
         )
         return response.text.strip()
 
-
+def log_rag_run(query, answer, citations, dataset_hash):
+    mlflow.set_experiment("scholarly-rag")
+    with mlflow.start_run(run_name="rag_query"):
+        mlflow.log_param("query", query)
+        mlflow.log_param("dataset_hash", dataset_hash)
+        mlflow.log_metric("num_citations", len(citations))
+        
 def format_evidence(evidence: List[dict]) -> str:
     """
     Formats the evidence into a readable string.
@@ -43,7 +52,7 @@ def format_evidence(evidence: List[dict]) -> str:
     blocks = []
     for e in evidence:
         blocks.append(f"[{e['paper_id']}:{e['section']}:{e['chunk_id']}]\n{e['text']}")
-    return f"\n\n".join(blocks)
+    return "\n\n".join(blocks)
 
 
 def adapt_for_rag(results, query):
@@ -63,7 +72,7 @@ def adapt_for_rag(results, query):
 
 
 def answer(
-    query: str, top_k: int = 8, k_min: int = 3, mode: str = "strict", retriever=None
+    query: str, top_k: int = 8, k_min: int = 1, mode: str = "strict", retriever=None
 ):
     """
     Answers the given query using the RAG pipeline.
@@ -78,6 +87,7 @@ def answer(
     logger = setup_logger(name="rag_answer", log_dir="./logs", level=logging.INFO)
     if retriever is None:
         retriever = Retriever(top_k=top_k)
+    current_dataset_hash = compute_dataset_hash()
     raw = retriever.search(query)
 
     from pipelines.retrieval.hydrate import attach_text
@@ -135,6 +145,12 @@ def answer(
             "answer": "I cannot answer this reliably with the available evidence.",
             "citations": [],
         }
+    log_rag_run(
+        query = query,
+        answer = response, 
+        citations = evidence, 
+        dataset_hash = current_dataset_hash
+    )
 
     return {
         "query": query,

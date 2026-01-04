@@ -1,9 +1,9 @@
 sources: 
   arxiv: 
     enabled: true
-    categories: ["cs.AI", "cs.CY"]
+    categories: ["cs.AI"]
     # max_papers: 1000 
-    max_papers: 5
+    max_papers: 25
     
   pmc:
     enabled: true

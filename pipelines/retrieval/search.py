@@ -54,7 +54,7 @@ class Retriever:
         scores, idxs = self.index.search(q_emb, self.top_k)
         
         results = []
-        MIN_SCORE = 0.35
+        MIN_SCORE = 0.0
         for score, idx in zip(scores[0], idxs[0]):
             m = self.meta[idx]
             results.append({
