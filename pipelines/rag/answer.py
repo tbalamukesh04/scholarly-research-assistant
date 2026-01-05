@@ -4,7 +4,6 @@ import os
 from typing import List
 
 import mlflow
-
 from google import genai
 
 from pipelines.retrieval.search import Retriever
@@ -34,13 +33,14 @@ class LLM:
         )
         return response.text.strip()
 
+
 def log_rag_run(query, answer, citations, dataset_hash):
-    mlflow.set_experiment("scholarly-rag")
-    with mlflow.start_run(run_name="rag_query"):
+    with mlflow.start_run(run_name="rag_query", nested=True):
         mlflow.log_param("query", query)
         mlflow.log_param("dataset_hash", dataset_hash)
         mlflow.log_metric("num_citations", len(citations))
-        
+
+
 def format_evidence(evidence: List[dict]) -> str:
     """
     Formats the evidence into a readable string.
@@ -126,14 +126,23 @@ def answer(
 
     prompt = f"""
     You are a scholarly assistant.
-    Instruction:
-    {instruction}
-
+    
+    You MUST follow these rules:
+    - Use ONLY the evidence provided below.
+    - Every factual claim MUST be directly supported by the evidence.
+    - Every sentence MUST include a citation.
+    - If the evidence is insufficient, incomplete, or contradictory, you MUST say:
+      "I cannot answer this reliably with the provided evidence."
+    
+    Do NOT use prior knowledge.
+    Do NOT guess.
+    Do NOT rephrase without evidence.
+    
     Question:
     {query}
-
+    
     Evidence:
-        {format_evidence(evidence)}
+    {evidence}
     """
     llm = LLM()
     response = llm.generate(prompt)
@@ -146,10 +155,10 @@ def answer(
             "citations": [],
         }
     log_rag_run(
-        query = query,
-        answer = response, 
-        citations = evidence, 
-        dataset_hash = current_dataset_hash
+        query=query,
+        answer=response,
+        citations=evidence,
+        dataset_hash=current_dataset_hash,
     )
 
     return {
