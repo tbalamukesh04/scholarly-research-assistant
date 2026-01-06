@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from typing import List
+import time
 
 import mlflow
 from google import genai
@@ -88,6 +89,7 @@ def answer(
     if retriever is None:
         retriever = Retriever(top_k=top_k)
     current_dataset_hash = compute_dataset_hash()
+    t0_retrieval = time.time()
     raw = retriever.search(query)
 
     from pipelines.retrieval.hydrate import attach_text
@@ -95,6 +97,8 @@ def answer(
     retrieved = adapt_for_rag(raw["results"], query)
     hydrated = attach_text(retrieved)
     evidence = hydrated["results"]
+    t1_retrieval = time.time()
+    retrieval_latency = t1_retrieval - t0_retrieval
 
     if len(evidence) < k_min:
         log_event(
@@ -107,8 +111,14 @@ def answer(
         return {
             "query": query,
             "answer": "I cannot answer this with the information that I have at the moment.",
-            "evidence": len(evidence),
+            "evidence": evidence,
             "citations": [],
+            "metrics": {
+                "retrieval_latency": retrieval_latency,
+                "llm_latency": 0.0,
+                "retrieved_chunks": len(evidence),
+                "refused": True
+            }
         }
 
     if mode == "strict":
@@ -144,16 +154,20 @@ def answer(
     Evidence:
     {evidence}
     """
+    t0_llm = time.time()
     llm = LLM()
     response = llm.generate(prompt)
+    t1_llm = time.time()
+    llm_latency = t1_llm - t0_llm
     if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
         response = "SYNTHESIS: " + response
+    
+    is_Refused = False
     if "does not explicitly" in response.lower() or "does not list" in response.lower():
-        return {
-            "query": query,
-            "answer": "I cannot answer this reliably with the available evidence.",
-            "citations": [],
-        }
+        response = "I cannot answer this reliably with the available evidence."
+        evidence = []
+        is_Refused = True
+        
     log_rag_run(
         query=query,
         answer=response,
@@ -167,6 +181,12 @@ def answer(
         "citations": [
             f"{e['paper_id']}:{e['section']}:{e['chunk_id']}" for e in evidence
         ],
+        'metrics':{
+            "retrieval_latency": retrieval_latency, 
+            "llm_latency": llm_latency, 
+            "retrieved_chunks": 0 if is_Refused else len(evidence),
+            "refused": is_Refused
+        }
     }
 
 

@@ -12,10 +12,18 @@ class Citation(BaseModel):
     section: str 
     score: float
     
+class QueryMetrics(BaseModel):
+    total_latency: float
+    retrieval_latency: float
+    llm_latency: float
+    retrieved_chunks: int
+    refused: int
+    
 class QueryResponse(BaseModel):
     query: str
     answer: Optional[str]
     citations: List[Citation]
     retrieval_only: bool
     dataset_hash: str
+    metrics: QueryMetrics
     
