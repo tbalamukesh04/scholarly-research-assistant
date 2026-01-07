@@ -8,6 +8,8 @@ import mlflow
 from google import genai
 
 from pipelines.retrieval.search import Retriever
+from pipelines.postprocess.checks import HallucinationChecker 
+from pipelines.retrieval.hydrate import attach_text
 from scripts.compute_dataset_hash import compute_dataset_hash
 from utils.logging import log_event, setup_logger
 
@@ -17,19 +19,12 @@ class LLM:
         self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
     def generate(self, prompt: str) -> str:
-        """
-        Generates a response to the given prompt using the Gemini API.
-        Args:
-            prompt (str): The prompt to generate a response for.
-        Returns:
-            str: The generated response.
-        """
         response = self.client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash-lite", 
             contents=prompt,
             config={
                 "temperature": 0.2,
-                "max_output_tokens": 512,
+                "max_output_tokens": 1024,
             },
         )
         return response.text.strip()
@@ -44,15 +39,13 @@ def log_rag_run(query, answer, citations, dataset_hash):
 
 def format_evidence(evidence: List[dict]) -> str:
     """
-    Formats the evidence into a readable string.
-    Args:
-        evidence (List[dict]): The evidence to format.
-    Returns:
-        str: The formatted evidence.
+    Formats evidence with simple integer IDs.
+    Example: [1] Text content...
     """
     blocks = []
-    for e in evidence:
-        blocks.append(f"[{e['paper_id']}:{e['section']}:{e['chunk_id']}]\n{e['text']}")
+    for i, e in enumerate(evidence):
+        # 1-based indexing for the LLM
+        blocks.append(f"[{i+1}] {e['text']}")
     return "\n\n".join(blocks)
 
 
@@ -63,7 +56,7 @@ def adapt_for_rag(results, query):
             {
                 "paper_id": r["paper_id"],
                 "chunk_id": r["chunk_id"],
-                "section": r["chunk_id"].split("::")[1].split("::")[0],
+                "section": r["chunk_id"].split("::")[2],
                 "order": int(r["chunk_id"].split("::chunk::")[1]),
                 "text": None,
             }
@@ -75,25 +68,16 @@ def adapt_for_rag(results, query):
 def answer(
     query: str, top_k: int = 8, k_min: int = 1, mode: str = "strict", retriever=None
 ):
-    """
-    Answers the given query using the RAG pipeline.
-    Args:
-        query (str): The query to answer.
-        top_k (int): The number of responses to retrieve.
-        k_min (int): The minimum number of responses required to answer the query.
-        mode (str): The mode of the answer. Can be "strict" or "loose".
-    Returns:
-        dict: The answer and evidence.
-    """
     logger = setup_logger(name="rag_answer", log_dir="./logs", level=logging.INFO)
     if retriever is None:
         retriever = Retriever(top_k=top_k)
+        
+    checker = HallucinationChecker() 
     current_dataset_hash = compute_dataset_hash()
+    
+    # --- RETRIEVAL ---
     t0_retrieval = time.time()
     raw = retriever.search(query)
-
-    from pipelines.retrieval.hydrate import attach_text
-
     retrieved = adapt_for_rag(raw["results"], query)
     hydrated = attach_text(retrieved)
     evidence = hydrated["results"]
@@ -101,96 +85,97 @@ def answer(
     retrieval_latency = t1_retrieval - t0_retrieval
 
     if len(evidence) < k_min:
-        log_event(
-            logger=logger,
-            level=logging.INFO,
-            message="Refusal: Insufficient Information",
-            retrieved=len(evidence),
-        )
+        return _construct_refusal(query, evidence, retrieval_latency, "Insufficient Information")
 
-        return {
-            "query": query,
-            "answer": "I cannot answer this with the information that I have at the moment.",
-            "evidence": evidence,
-            "citations": [],
-            "metrics": {
-                "retrieval_latency": retrieval_latency,
-                "llm_latency": 0.0,
-                "retrieved_chunks": len(evidence),
-                "refused": True
-            }
-        }
-
-    if mode == "strict":
-        instruction = (
-            "Answer the question with ONLY using the evidence below."
-            "If the evidence is insufficient or contradictory, say so."
-            "Every Claim Must be cited."
-        )
-    elif mode == "loose":
-        instruction = (
-            "Answer using the evidence below. "
-            "You may synthesize across sources, but you MUST label the answer as SYNTHESIS. "
-            "Every claim must be cited."
-        )
-
-    prompt = f"""
+    # --- PROMPT PREP ---
+    evidence_text = format_evidence(evidence)
+    
+    # Corrected: Explicitly defining the format in the prompt
+    system_prompt = f"""
     You are a scholarly assistant.
     
-    You MUST follow these rules:
+    Rules:
     - Use ONLY the evidence provided below.
-    - Every factual claim MUST be directly supported by the evidence.
-    - Every sentence MUST include a citation.
-    - If the evidence is insufficient, incomplete, or contradictory, you MUST say:
-      "I cannot answer this reliably with the provided evidence."
-    
-    Do NOT use prior knowledge.
-    Do NOT guess.
-    Do NOT rephrase without evidence.
-    
-    Question:
-    {query}
+    - Every sentence MUST include a citation in the format [index].
+    - Example: "The sky is blue [1]."
+    - If the evidence is insufficient, say: "I cannot answer this reliably."
     
     Evidence:
-    {evidence}
+    {evidence_text}
     """
-    t0_llm = time.time()
-    llm = LLM()
-    response = llm.generate(prompt)
-    t1_llm = time.time()
-    llm_latency = t1_llm - t0_llm
-    if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
-        response = "SYNTHESIS: " + response
-    
-    is_Refused = False
-    if "does not explicitly" in response.lower() or "does not list" in response.lower():
-        response = "I cannot answer this reliably with the available evidence."
-        evidence = []
-        is_Refused = True
-        
-    log_rag_run(
-        query=query,
-        answer=response,
-        citations=evidence,
-        dataset_hash=current_dataset_hash,
-    )
 
+    # --- GENERATION LOOP (MAX 3) ---
+    MAX_RETRIES = 3
+    attempt = 0
+    current_prompt = f"{system_prompt}\n\nQuestion:\n{query}"
+    
+    llm = LLM()
+    t0_llm = time.time()
+    
+    while attempt < MAX_RETRIES:
+        logger.info(f"Generation Attempt {attempt + 1}")
+        
+        response = llm.generate(current_prompt)
+        
+        if "cannot answer" in response.lower() and len(response) < 100:
+             return _construct_refusal(query, evidence, retrieval_latency, "Model Refused Content")
+
+        check_result = checker.run_checks(response, evidence)
+        
+        if check_result["verification_passed"]:
+            t1_llm = time.time()
+            
+            # Map integer indices back to real IDs for the final JSON
+            real_citations = []
+            for idx in check_result["cited_indices"]:
+                # Adjust for 0-based list vs 1-based prompt
+                e = evidence[idx - 1] 
+                real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
+
+            if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
+                response = "SYNTHESIS: " + response
+                
+            log_rag_run(query, response, real_citations, current_dataset_hash)
+            
+            return {
+                "query": query,
+                "answer": response,
+                "citations": real_citations, 
+                'metrics':{
+                    "retrieval_latency": retrieval_latency, 
+                    "llm_latency": t1_llm - t0_llm, 
+                    "retrieved_chunks": len(evidence),
+                    "refused": False,
+                    "attempts": attempt + 1
+                }
+            }
+        
+        errors = "; ".join(check_result["errors"])
+        logger.warning(f"Attempt {attempt + 1} failed checks: {errors}")
+        # Corrected: Explicitly instructing the format for the retry
+        current_prompt += f"\n\nPREVIOUS RESPONSE WAS REJECTED. REASON: {errors}. \nREWRITE THE ANSWER CORRECTLY USING [index]."
+        attempt += 1
+
+    logger.error("Max retries reached. Refusing answer.")
+    return _construct_refusal(query, evidence, retrieval_latency, "Max Retries Failed")
+
+
+def _construct_refusal(query, evidence, ret_latency, reason):
     return {
         "query": query,
-        "answer": response,
-        "citations": [
-            f"{e['paper_id']}:{e['section']}:{e['chunk_id']}" for e in evidence
-        ],
-        'metrics':{
-            "retrieval_latency": retrieval_latency, 
-            "llm_latency": llm_latency, 
-            "retrieved_chunks": 0 if is_Refused else len(evidence),
-            "refused": is_Refused
+        "answer": "I cannot answer this reliably with the available evidence (Verification Failed).",
+        "evidence": evidence,
+        "citations": [],
+        "metrics": {
+            "retrieval_latency": ret_latency,
+            "llm_latency": 0.0,
+            "retrieved_chunks": len(evidence),
+            "refused": True,
+            "refusal_reason": reason
         }
     }
 
-
 if __name__ == "__main__":
-    query = "How does Pooling by Multihead Attention (PMA) differ from EOS and mean pooling for code embeddings?"
-    results = answer(query, 20, 3)
+    query = "What is the role of the Transformer architecture and the attention mechanism in modern foundation models?"
+    results = answer(query, 10, 3)
     print(json.dumps(results, indent=2))
