@@ -42,43 +42,57 @@ def get_session():
     })
     return session
 
-def resolve_pdf_url(session, initial_url):
+def resolve_pdf_url(session, initial_url, pmc_id=None):
     """
     Fetches the initial URL. If it's a PDF, returns content.
     If HTML, scrapes the 'citation_pdf_url' meta tag and fetches that.
+    Falls back to Europe PMC if primary fails and pmc_id is provided.
     """
-    resp = session.get(initial_url, timeout=30, allow_redirects=True)
-    resp.raise_for_status()
-    
-    content_type = resp.headers.get("Content-Type", "").lower()
-    
-    # Case 1: Direct PDF
-    if "pdf" in content_type:
-        return resp.content, initial_url
+    try:
+        resp = session.get(initial_url, timeout=30, allow_redirects=True)
+        resp.raise_for_status()
         
-    # Case 2: HTML Wrapper -> Extract Real Link
-    if "html" in content_type:
-        # Use regex to find <meta name="citation_pdf_url" content="...">
-        # This is standard HighWire Press / Google Scholar metadata
-        match = re.search(r'<meta\s+name=["\']citation_pdf_url["\']\s+content=["\'](.*?)["\']', resp.text, re.IGNORECASE)
-        if match:
-            real_pdf_url = match.group(1)
-            # Handle relative URLs if necessary (rare on PMC but possible)
-            if not real_pdf_url.startswith("http"):
-                # Basic join (assumes root relative)
-                base = "https://pmc.ncbi.nlm.nih.gov" 
-                real_pdf_url = base + real_pdf_url if real_pdf_url.startswith("/") else base + "/" + real_pdf_url
-                
-            # Fetch the real PDF
-            pdf_resp = session.get(real_pdf_url, timeout=30)
-            pdf_resp.raise_for_status()
+        content_type = resp.headers.get("Content-Type", "").lower()
+        
+        # Case 1: Direct PDF
+        if "pdf" in content_type:
+            return resp.content, initial_url
             
-            if "pdf" not in pdf_resp.headers.get("Content-Type", "").lower():
-                raise ValueError(f"Extracted URL {real_pdf_url} did not return PDF.")
+        # Case 2: HTML Wrapper -> Extract Real Link
+        if "html" in content_type:
+            # Use regex to find <meta name="citation_pdf_url" content="...">
+            # This is standard HighWire Press / Google Scholar metadata
+            match = re.search(r'<meta\s+name=["\']citation_pdf_url["\']\s+content=["\'](.*?)["\']', resp.text, re.IGNORECASE)
+            if match:
+                real_pdf_url = match.group(1)
+                # Handle relative URLs if necessary (rare on PMC but possible)
+                if not real_pdf_url.startswith("http"):
+                    # Basic join (assumes root relative)
+                    base = "https://pmc.ncbi.nlm.nih.gov" 
+                    real_pdf_url = base + real_pdf_url if real_pdf_url.startswith("/") else base + "/" + real_pdf_url
+                    
+                # Fetch the real PDF
+                pdf_resp = session.get(real_pdf_url, timeout=30)
+                pdf_resp.raise_for_status()
                 
-            return pdf_resp.content, real_pdf_url
-            
-    raise ValueError("Could not resolve actual PDF binary from URL.")
+                if "pdf" in pdf_resp.headers.get("Content-Type", "").lower():
+                    return pdf_resp.content, real_pdf_url
+    except Exception as e:
+        logging.warning(f"Primary PDF resolution failed for {initial_url}: {e}")
+
+    # Fallback: Europe PMC
+    if pmc_id:
+        europe_url = f"https://europepmc.org/backend/ptpmcrender.fcgi?accid={pmc_id}&blobtype=pdf"
+        try:
+            logging.info(f"Attempting Europe PMC fallback for {pmc_id}")
+            resp = session.get(europe_url, timeout=30)
+            resp.raise_for_status()
+            if "pdf" in resp.headers.get("Content-Type", "").lower():
+                return resp.content, europe_url
+        except Exception as e:
+            logging.error(f"Europe PMC fallback failed for {pmc_id}: {e}")
+
+    raise ValueError("Could not resolve actual PDF binary from URL (Primary & Fallback failed).")
 
 #----------------------
 #----Core Logic--------
@@ -121,6 +135,10 @@ def acquire_pmc_pdfs():
         if not pdf_url:
             skipped += 1
             continue
+            
+        # PMC viewer often has POW protection, use article page to find direct link
+        if pdf_url and "pmc/articles/PMC" in pdf_url and pdf_url.endswith("/pdf/"):
+            pdf_url = pdf_url.replace("/pdf/", "/")
         
         pdf_path = pdf_dir / f'{paper_id}.pdf'
         
@@ -130,7 +148,7 @@ def acquire_pmc_pdfs():
         
         try:
             # Attempt to resolve and download
-            pdf_content, final_url = resolve_pdf_url(session, pdf_url)
+            pdf_content, final_url = resolve_pdf_url(session, pdf_url, record.get("source_id"))
             
             pdf_path.write_bytes(pdf_content)
             checksum = sha256_file(pdf_path)

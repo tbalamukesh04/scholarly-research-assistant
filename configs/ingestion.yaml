@@ -8,7 +8,7 @@ sources:
   pmc:
     enabled: true
     # max_papers: 1000
-    max_papers: 5
+    max_papers: 50
     sleep_records : 0.5
     terms: ["artificial intelligence"]
   
