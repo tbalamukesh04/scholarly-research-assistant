@@ -1,0 +1,125 @@
+[
+  {
+    "id": "01",
+    "query": "How do data quality, annotation strategies, and dataset construction choices affect model generalization and downstream performance?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "0fb301391f658c207e45e14a355666dda49212804958496acf5d467bf99986be",
+      "2f2aaf56f8dd69c498492b512d23b77f9f494837c37a3dce42f598f43006b0f6",
+      "f6127e7bf85b22f6b1ca7fe5795dcf34fecefbd48eec05f5d3b500dcee3db455"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "02",
+    "query": "What evaluation protocols and metrics are necessary to reliably assess model performance beyond benchmark overfitting?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "1a5c90214577b98307fed2950426cb6c1d7b78633038be0cc77269fc03931796",
+      "2fb83a55a88d3b1d28db7b798e0326c1cd6326dea7ad175ddb445b70f83f6438",
+      "f80a116fa9652a18f002a5ead91830b1cb4dc507098b73e017088f8027a9ce26"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "03", 
+    "query": "How can models mitigate hallucination and ungrounded generation while preserving task performance?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "0fb301391f658c207e45e14a355666dda49212804958496acf5d467bf99986be",
+      "1fbda62cf77971012ee902014d347775a8cdac86c2ad7e5d436ed0db54d9c72d",
+      "f6cc773de1d5c1550ac5d0af20bad9b47f0299d2864b82e0de99dfc5008ed8c3",
+      "f238a53e7715245a8dd81fc84bf5f8571e0a3f72f64d82ed02268c92dc94bc39"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "04",
+    "query": "What are the trade-offs between model complexity, computational efficiency, and real-world deployability?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "1d89b1b1e5aec7f8a697349c54abc014fe605949d748bffa6d4fec84730f55c4",
+      "f67045c55ceaaf29345a82521762b075ed75a503753aac2e8d4e18cda88b2d00",
+      "e8e90a609cec20d5549ff849860cd67f8207dd165ec44b53f07c176cee76d573"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "05", 
+    "query": "How does task or domain heterogeneity influence model generalization and transfer performance?",
+    "relevant_papers": [
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "1b9185a740467a02c65ce4de246a86bb3e7cc2a13ab8d5677bc7a8e65bc00245",
+      "fe48500154d878e2d2c81d1d55070fa8e979251c4c79a3d0169c2aecc5b5c911"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "06",
+    "query": "What methods improve robustness and stability of model outputs under distribution shift or noisy inputs?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "1a5c90214577b98307fed2950426cb6c1d7b78633038be0cc77269fc03931796",
+      "1b3ebf513b6bc5b3fac426d956323a7c4ab74527810a5a127b2c3fc529238833",
+      "f50fe5ece5c10bb70cfe169b9cb5b9a1a4cf7d0134a0203368605c7360ebfdc7",
+      "f6127e7bf85b22f6b1ca7fe5795dcf34fecefbd48eec05f5d3b500dcee3db455"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "07",
+    "query": "How can explainability or interpretability techniques be integrated without degrading model performance?",
+    "relevant_papers": [
+      "0fb301391f658c207e45e14a355666dda49212804958496acf5d467bf99986be",
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "e6e4e9f0de926dd0f08ed76a609b361a5cdd70e4d352b2f08d20374a06cb92c3",
+      "f80a116fa9652a18f002a5ead91830b1cb4dc507098b73e017088f8027a9ce26"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "08",
+    "query": "What validation strategies are required to ensure reproducibility and reliability of reported results?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "1b93ab9a2ea2d24a7358027eabe63d67ce5ccef527b119caa2beffea963bdf44",
+      "f67045c55ceaaf29345a82521762b075ed75a503753aac2e8d4e18cda88b2d00",
+      "fe48500154d878e2d2c81d1d55070fa8e979251c4c79a3d0169c2aecc5b5c911"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "09",
+    "query": "How do training objectives and optimization choices influence convergence and downstream task performance?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "1d89b1b1e5aec7f8a697349c54abc014fe605949d748bffa6d4fec84730f55c4",
+      "f238a53e7715245a8dd81fc84bf5f8571e0a3f72f64d82ed02268c92dc94bc39",
+      "e8e90a609cec20d5549ff849860cd67f8207dd165ec44b53f07c176cee76d573"
+    ],
+    "should_refuse": false
+  },
+  {
+    "id": "10",
+    "query": "What are the key limitations and open challenges identified across current approaches, and how can they be systematically addressed?",
+    "relevant_papers": [
+      "22aa53245f6ef08b6d5380a270e0461bcf35fe98232746c006ed9bc7edd3f7de",
+      "a689e86d4eab17566942d2922d89ef5a79074b4d5e6d7d320c5f3507ab8801ed",
+      "baf53702f26138946e51a878109ef0c655df6a9e17fff4ae45f76422bfcce3a5",
+      "0fb301391f658c207e45e14a355666dda49212804958496acf5d467bf99986be",
+      "1fbda62cf77971012ee902014d347775a8cdac86c2ad7e5d436ed0db54d9c72d",
+      "fe48500154d878e2d2c81d1d55070fa8e979251c4c79a3d0169c2aecc5b5c911"
+    ],
+    "should_refuse": false
+  }
+]

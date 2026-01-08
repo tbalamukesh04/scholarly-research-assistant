@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import List
+from typing import List, Optional
 import time
 
 import mlflow
@@ -13,6 +13,7 @@ from pipelines.postprocess.align import Attributor, split_into_sentences
 from pipelines.retrieval.hydrate import attach_text
 from scripts.compute_dataset_hash import compute_dataset_hash
 from utils.logging import log_event, setup_logger
+from pipelines.postprocess.confidence import ConfidenceScorer
 
 
 class LLM:
@@ -40,6 +41,11 @@ def log_rag_run(query, answer, citations, dataset_hash, metrics):
         mlflow.log_metric("unaligned_sentences", metrics.get("unaligned_sentences", 0))
         mlflow.log_metric("refused", int(metrics.get("refused", False)))
         mlflow.log_metric("retrieval_latency", metrics.get("retrieval_latency", 0.0))
+        
+        if "confidence_score" in metrics:
+            mlflow.log_metric("confidence_score", metrics["confidence_score"])
+            mlflow.log_metric("alignment_score", metrics["alignment_score"])
+            mlflow.log_metric("recall_score", metrics['recall_score'])
 
 def format_evidence(evidence: List[dict]) -> str:
     """
@@ -70,7 +76,14 @@ def adapt_for_rag(results, query):
 
 
 def answer(
-    query: str, top_k: int = 8, k_min: int = 1, mode: str = "strict", retriever=None
+    query: str, 
+    top_k: int = 8, 
+    k_min: int = 1, 
+    mode: str = "strict", 
+    retriever = None, 
+    eval_mode: bool = False,
+    relevant_papers: Optional[List[str]] = None, 
+    confidence_threshold: float = 0.0
 ):
     logger = setup_logger(name="rag_answer", log_dir="./logs", level=logging.INFO)
     
@@ -82,24 +95,26 @@ def answer(
     attributor = Attributor(retriever.model)
     checker = HallucinationChecker() 
     current_dataset_hash = compute_dataset_hash()
-    
+        
     # --- RETRIEVAL ---
     t0_retrieval = time.time()
     raw = retriever.search(query)
-    print("RAW: \n", raw)
+    # print("RAW: \n", raw)
+    retrieved_ids = [r["paper_id"] for r in raw.get("results", [])]
+    
     retrieved = adapt_for_rag(raw["results"], query)
     hydrated = attach_text(retrieved)
     evidence = hydrated["results"]
     t1_retrieval = time.time()
     retrieval_latency = t1_retrieval - t0_retrieval
-
+    
     if len(evidence) < k_min:
-        print("Evidence ", len(evidence))
+        # print("Evidence ", len(evidence))
         return _construct_refusal(query, evidence, retrieval_latency, "Insufficient Information")
 
     # --- PROMPT PREP ---
     evidence_text = format_evidence(evidence)
-    print("Evidence Length: ", len(evidence_text))
+    # print("Evidence Length: ", len(evidence_text))
     system_prompt = f"""
     You are a scholarly assistant.
     
@@ -122,7 +137,11 @@ def answer(
     t0_llm = time.time()
     
     while attempt < MAX_RETRIES:
-        logger.info(f"Generation Attempt {attempt + 1}")
+        log_event(
+            logger = logger, 
+            level = logging.INFO, 
+            message = f"Generation Attempt {attempt + 1}"
+        )
         
         response = llm.generate(current_prompt)
         
@@ -143,7 +162,7 @@ def answer(
             # 2. Attribution Check (Semantic Similarity)
             # Only run if syntax is valid to avoid parsing garbage
             sentences = split_into_sentences(response)
-            attr_result = attributor.verify(sentences, evidence, threshold=0.35)
+            attr_result = attributor.verify(sentences, evidence, threshold=0.2)
             
             if not attr_result["attribution_passed"]:
                 current_errors.extend(attr_result["failures"])
@@ -152,16 +171,7 @@ def answer(
         if not current_errors:
             # --- SUCCESS ---
             t1_llm = time.time()
-            
-            # Map integer indices back to real IDs
-            real_citations = []
-            for idx in syntax_result["cited_indices"]:
-                e = evidence[idx - 1] 
-                real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
-
-            if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
-                response = "SYNTHESIS: " + response
-                
+        
             metrics = {
                 "retrieval_latency": retrieval_latency, 
                 "llm_latency": t1_llm - t0_llm,
@@ -172,6 +182,50 @@ def answer(
                 "total_sentences": len(sentences), 
                 "unaligned_sentences": 0
             }
+            
+            if eval_mode:
+                if relevant_papers is None:
+                    log_event(
+                        logger = logger, 
+                        level = logging.WARNING, 
+                        message = "Eval Mode enabled but no relevant Papers"
+                    )
+    
+                    relevant_papers = []
+                
+                scorer = ConfidenceScorer()    
+                conf_metrics = scorer.calculate(
+                    alignment_details = attr_result["details"], 
+                    retrieved_ids = retrieved_ids, 
+                    relevant_papers=relevant_papers, 
+                    k = top_k
+                )
+                current_confidence = conf_metrics["confidence_score"]
+                log_event(
+                    logger = logger, 
+                    level = logging.INFO, 
+                    message = f"Confidence Score: {current_confidence} (Threshold: {confidence_threshold})"
+                )
+                
+                if current_confidence < confidence_threshold:
+                    return _construct_refusal(
+                        query, 
+                        evidence, 
+                        retrieval_latency, 
+                        f"Low Confidence ({current_confidence:.2f} < {confidence_threshold})"
+                    )
+                
+                metrics.update(conf_metrics)
+            
+            # Map integer indices back to real IDs
+            real_citations = []
+            for idx in syntax_result["cited_indices"]:
+                e = evidence[idx - 1] 
+                real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
+
+            if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
+                response = "SYNTHESIS: " + response
+                
             
             log_rag_run(query, response, real_citations, current_dataset_hash, metrics)
             
@@ -184,12 +238,20 @@ def answer(
         
         # --- FAILURE: PREPARE RETRY ---
         error_msg = "; ".join(current_errors)
-        logger.warning(f"Attempt {attempt + 1} failed: {error_msg}")
+        log_event(
+            logger = logger, 
+            level = logging.WARNING, 
+            message = f"Attempt {attempt + 1} failed: {error_msg}"
+        )
         current_prompt += f"\n\nPREVIOUS RESPONSE REJECTED. REASON: {error_msg}. \nREWRITE CORRECTLY USING [index]."
         attempt += 1
 
     # --- FINAL REFUSAL ---
-    logger.error("Max retries reached. Refusing answer.")
+    log_event(
+        logger = logger, 
+        level = logging.ERROR, 
+        message = "Max retries reached. Refusing answer."
+    )
     return _construct_refusal(query, evidence, retrieval_latency, "Max Retries Failed")
 
 
@@ -211,8 +273,24 @@ def _construct_refusal(query, evidence, ret_latency, reason):
     }
 
 if __name__ == "__main__":
-    query = """Which programming language is consistently mentioned as the primary
-               tool for implementing models, functions, or data synthesis pipelines
-               in various technical frameworks and research studies?"""
-    results = answer(query, 10, 3)
+    with open(r"pipelines\evaluation\data\eval_queries.json", encoding="utf-8") as f:
+        input = json.load(f)
+    
+    query = input[2]["query"]
+    relevant_papers = input[2]["relevant_papers"]
+    print("--- EVAL MODE ---")
+    results = answer(
+        query, 
+        eval_mode=True, 
+        relevant_papers=relevant_papers, # Empty list = 0 recall -> Low confidence
+        confidence_threshold=0.8 
+    )
+    print(json.dumps(results, indent=2))
+    
+    # Case 2: Normal Mode (Should proceed despite low confidence underlying)
+    print("\n--- NORMAL MODE ---")
+    results = answer(
+        query, 
+        eval_mode=False
+    )
     print(json.dumps(results, indent=2))

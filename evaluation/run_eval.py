@@ -16,6 +16,9 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_PATH = Path("evaluation/cache/answers.json")
 CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
+# Confidence threshold for evaluation runs
+CONFIDENCE_THRESHOLD = 0.30
+
 if CACHE_PATH.exists():
     with CACHE_PATH.open("r", encoding="utf-8") as f:
         ANSWER_CACHE = json.load(f)
@@ -41,14 +44,24 @@ def main():
         )
 
         citation_metrics = evaluate_citations(
-            queries=queries, retriever=shared_retriever, cache=ANSWER_CACHE
+            queries=queries, 
+            retriever=shared_retriever, 
+            cache=ANSWER_CACHE,
+            confidence_threshold=CONFIDENCE_THRESHOLD
         )
+        
         refusal_metrics = evaluate_refusals(
-            queries=queries, retriever=shared_retriever, cache=ANSWER_CACHE
+            queries=queries, 
+            retriever=shared_retriever, 
+            cache=ANSWER_CACHE,
+            confidence_threshold=CONFIDENCE_THRESHOLD
         )
 
         results = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "config": {
+                "confidence_threshold": CONFIDENCE_THRESHOLD
+            },
             "retrieval": retrieval_metrics,
             "citation": citation_metrics,
             "refusal": refusal_metrics,
@@ -70,7 +83,8 @@ def main():
         json.dump(ANSWER_CACHE, f, indent=2)
 
     print("Evaluation completed.")
-    print(json.dumps(results["retrieval"], indent=2))
+    print("Citation Metrics:", json.dumps(results["citation"], indent=2))
+    print("Refusal Metrics:", json.dumps(results["refusal"], indent=2))
 
 
 if __name__ == "__main__":

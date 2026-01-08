@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         log_event(server_logger, logging.CRITICAL, "Startup Error", error = str(e))
     yield
+    
     log_event(server_logger, logging.INFO, "Server Shutdown Initiated")
 
 app = FastAPI(
@@ -41,7 +42,8 @@ app = FastAPI(
 def query(
     req: QueryRequest,
     retriever=Depends(get_retriever),
-    dataset_hash: str = Depends(get_dataset_hash),
+    dataset_hash: str = Depends(get_dataset_hash)
+    
 ):
     start_time = time.time()
     metrics_tracker = RequestMetrics()
@@ -52,6 +54,8 @@ def query(
             top_k=req.top_k,
             mode=req.mode,
             retriever=retriever,
+            eval_mode = req.eval_mode, 
+            relevant_papers = req.relevant_papers
         )
         
         total_time = metrics_tracker.total_time()
@@ -87,7 +91,8 @@ def query(
             retrieval_latency = result.get("metrics", {}).get("retrieval_latency", 0.0),
             llm_latency = result.get("metrics", {}).get("llm_latency", 0.0), 
             retrieved_chunks = result.get("metrics", {}).get("retrieved_chunks", 0),
-            refused = 1 if result.get("metrics", {}).get("refused", False) else 0
+            refused = 1 if result.get("metrics", {}).get("refused", False) else 0,
+            confidence_score = result.get("metrics", {}).get("confidence_score", 0.0)
         )
 
         return QueryResponse(

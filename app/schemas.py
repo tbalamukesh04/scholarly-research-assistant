@@ -5,6 +5,8 @@ class QueryRequest(BaseModel):
     query: str
     top_k: int = 10
     mode: Literal["strict", "exploratory"] = "strict"
+    eval_mode: bool = False
+    relevant_papers: Optional[List[str]] = None
     
 class Citation(BaseModel):
     paper_id: str
@@ -18,6 +20,7 @@ class QueryMetrics(BaseModel):
     llm_latency: float
     retrieved_chunks: int
     refused: int
+    confidence_score: float = 0.0
     
 class QueryResponse(BaseModel):
     query: str
