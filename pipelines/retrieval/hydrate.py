@@ -1,8 +1,20 @@
 import json
 from pathlib import Path
+import re
 
 CHUNKS_DIR = Path("data/processed/chunks")
 
+def clean_pdf_artifacts(text: str) -> str:
+    if not text: return ""
+
+    text = re.sub(r'(\d)\.?(\d+)?([A-Za-z])', r'\1.\2 \3', text)
+
+    text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
+    
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text
+    
 def norm(s: str):
     return (s or "").strip().lower()
 def attach_text(retrieval_output: dict) -> dict:
@@ -36,7 +48,7 @@ def attach_text(retrieval_output: dict) -> dict:
                 
             for ch in sec.get("chunks", []):
                 if ch["chunk_id"] == r["chunk_id"]:
-                    r["text"] = ch["text"]
+                    r["text"] = clean_pdf_artifacts(ch["text"])
                     found = True
                     break
                     
