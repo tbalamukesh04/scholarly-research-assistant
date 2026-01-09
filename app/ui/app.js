@@ -27,13 +27,27 @@ async function submitQuery() {
     
     const isRefusal = (data.metrics && data.metrics.refused_count > 0) || 
                       (data.answer && data.answer.includes("cannot answer"));
+    
+    const isTruncated = data.metrics && data.metrics.truncated;
+    
+    responseBox.innerHTML = "";
+    
     if (isRefusal) {
       responseBox.className = "refusal";
+      responseBox.innerText = data.answer ?? "No Answer Found.";
     } else {
       responseBox.className = "success";
+      
+      const answerText = document.createTextNode(data.answer ?? "No Answer found.");
+      responseBox.appendChild(answerText);
+      
+      if (isTruncated) {
+        const warningDiv = document.createElement("div");
+        warningDiv.className = "trunction-warning";
+        warning.warningDiv.innerText = `[WARNING] Answer Truncated due to weak evidence. (${data.metrics.dropped_sentences}) sentences dropped`;
+        responseBox.appendChild(warningDiv);
+      }
     }
-    
-    responseBox.innerText = data.answer ?? "No answer found.";
   } catch(err) {
     responseBox.className = "error";
     responseBox.innerText = "Error: " + err.message;

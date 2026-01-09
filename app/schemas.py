@@ -21,6 +21,8 @@ class QueryMetrics(BaseModel):
     retrieved_chunks: int
     refused: int
     confidence_score: float = 0.0
+    truncated: bool = False
+    dropped_sentences: int = 0
     
 class QueryResponse(BaseModel):
     query: str

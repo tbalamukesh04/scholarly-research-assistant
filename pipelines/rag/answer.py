@@ -7,6 +7,7 @@ import time
 import mlflow
 from google import genai
 
+from pipelines.postprocess.truncate import apply_strict_truncation, reconstruct_final_answer
 from pipelines.retrieval.search import Retriever
 from pipelines.postprocess.checks import HallucinationChecker 
 from pipelines.postprocess.align import Attributor, split_into_sentences
@@ -39,6 +40,8 @@ def log_rag_run(query, answer, citations, dataset_hash, metrics):
         mlflow.log_metric("num_citations", len(citations))
         mlflow.log_metric("total_sentences", metrics.get("total_sentences", 0))
         mlflow.log_metric("unaligned_sentences", metrics.get("unaligned_sentences", 0))
+        mlflow.log_metric("truncated", int(metrics.get("truncated", False)))
+        mlflow.log_metric("refused", int(metrics.get("refused", False)))
         mlflow.log_metric("refused", int(metrics.get("refused", False)))
         mlflow.log_metric("retrieval_latency", metrics.get("retrieval_latency", 0.0))
         
@@ -153,6 +156,16 @@ def answer(
         current_errors = []
         sentences = []
         
+        metrics = {
+            "retrieval_latency": retrieval_latency, 
+            "llm_latency": 0.0, 
+            "retrieved_chunks": len(evidence), 
+            "refused": False, 
+            "truncated": False, 
+            "attempts": attempt + 1, 
+            "total_sentences": 0, 
+            "unaligned_sentences": 0
+        }
         # 1. Syntax Check (Format & Bounds)
         syntax_result = checker.run_checks(response, evidence)
                 
@@ -164,25 +177,36 @@ def answer(
             sentences = split_into_sentences(response)
             attr_result = attributor.verify(sentences, evidence, threshold=0.2)
             
-            if not attr_result["attribution_passed"]:
-                current_errors.extend(attr_result["failures"])
-
+            truncated_details = apply_strict_truncation(attr_result["details"])
+            response = reconstruct_final_answer(truncated_details)
+            
+            metrics["total_sentences"] = len(truncated_details)
+            metrics["unaligned_sentences"] = len(attr_result["details"]) - len(truncated_details)
+            metrics["truncated"] = len(attr_result["details"]) > len(truncated_details)
+            
+            if not truncated_details:
+                _construct_refusal(query, evidence, retrieval_latency, "All content unsupported")
+                
         # Pass or Retry?
         if not current_errors:
             # --- SUCCESS ---
             t1_llm = time.time()
         
-            metrics = {
-                "retrieval_latency": retrieval_latency, 
-                "llm_latency": t1_llm - t0_llm,
-                "retrieved_chunks": len(evidence),
-                "refused": False,
-                "attempts": attempt + 1,
-                "safety_check": "passed", 
-                "total_sentences": len(sentences), 
-                "unaligned_sentences": 0
-            }
+            metrics["retrieval_latency"] = retrieval_latency 
+            metrics["llm_latency"] = t1_llm - t0_llm
+            metrics["retrieved_chunks"] = len(evidence)
+            metrics["refused"] = False
+            metrics["attempts"] = attempt + 1
+            metrics["safety_check"] = "passed" 
+            metrics["total_sentences"] = len(sentences) 
+            metrics["unaligned_sentences"] = 0
             
+            if metrics["truncated"]:
+                log_event(
+                    logger = logger, 
+                    level = logging.WARNING, 
+                    message = f'TRUNCATION EVENT: Dropped {metrics["unaligned_sentences"]} sentences. Kept {metrics["total_sentences"]}.',
+                )
             if eval_mode:
                 if relevant_papers is None:
                     log_event(

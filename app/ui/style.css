@@ -10,3 +10,13 @@ pre {background: #111; padding: 20px; border-left: 5px solid #333; white-space: 
 .success {color: #0f0; border-left-color: #0f0;}
 .refusal {color: #ffae00; border-left-color: #ffae00;}
 .error {color: #ff3333; border-left-color: #ff3333;}
+
+.truncation-warning {
+    display: block;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #332b00;
+    border: 1px solid #ffae00;
+    color: #ffae00;
+    font-weight: bold;
+}
