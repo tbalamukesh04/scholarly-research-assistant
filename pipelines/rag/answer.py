@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import time
 
 import mlflow
@@ -15,6 +15,7 @@ from pipelines.retrieval.hydrate import attach_text
 from scripts.compute_dataset_hash import compute_dataset_hash
 from utils.logging import log_event, setup_logger
 from pipelines.postprocess.confidence import ConfidenceScorer
+from pipelines.postprocess.refusal import check_refusal
 
 
 class LLM:
@@ -22,42 +23,90 @@ class LLM:
         self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
     def generate(self, prompt: str) -> str:
-        response = self.client.models.generate_content(
-            model="gemini-2.5-flash-lite", 
-            contents=prompt,
-            config={
-                "temperature": 0.2,
-                "max_output_tokens": 1024,
-            },
-        )
-        return response.text.strip()
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash-lite", 
+                contents=prompt,
+                config={
+                    "temperature": 0.2,
+                    "max_output_tokens": 1024,
+                },
+            )
+            return response.text.strip()
+        except Exception as e:
+            return ""
 
 
 def log_rag_run(query, answer, citations, dataset_hash, metrics):
+    """
+    Logs the RAG query execution to MLflow.
+    Captures refusal reasons and confidence scores explicitly.
+    """
     with mlflow.start_run(run_name="rag_query", nested=True):
         mlflow.log_param("query", query)
         mlflow.log_param("dataset_hash", dataset_hash)
+        
+        # Log Refusal Reason if it exists
+        if metrics.get("refusal_reason"):
+             mlflow.log_param("refusal_reason", metrics["refusal_reason"])
+
         mlflow.log_metric("num_citations", len(citations))
         mlflow.log_metric("total_sentences", metrics.get("total_sentences", 0))
         mlflow.log_metric("unaligned_sentences", metrics.get("unaligned_sentences", 0))
         mlflow.log_metric("truncated", int(metrics.get("truncated", False)))
         mlflow.log_metric("refused", int(metrics.get("refused", False)))
-        mlflow.log_metric("refused", int(metrics.get("refused", False)))
         mlflow.log_metric("retrieval_latency", metrics.get("retrieval_latency", 0.0))
         
+        # Log Confidence & Retrieval Metrics if available
         if "confidence_score" in metrics:
             mlflow.log_metric("confidence_score", metrics["confidence_score"])
+        if "alignment_score" in metrics:
             mlflow.log_metric("alignment_score", metrics["alignment_score"])
-            mlflow.log_metric("recall_score", metrics['recall_score'])
+        if "recall_score" in metrics:
+            mlflow.log_metric("recall_score", metrics["recall_score"])
+
+
+def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None):
+    """
+    Constructs the refusal response and logs it to MLflow.
+    Merges prior_metrics (e.g. confidence) to ensure we know WHY it was refused.
+    """
+    # Base metrics for a refusal
+    metrics = {
+        "retrieval_latency": 0.0,
+        "llm_latency": 0.0,
+        "retrieved_chunks": len(evidence) if evidence else 0,
+        "refused": True,
+        "refusal_reason": reason, 
+        "total_sentences": 0, 
+        "unaligned_sentences": 0,
+        "confidence_score": 0.0, # Default, overwritten by prior_metrics if present
+        "alignment_score": 0.0,
+        "recall_score": 0.0
+    }
+    
+    # Merge any calculated metrics (e.g. latency, confidence)
+    if prior_metrics:
+        metrics.update(prior_metrics)
+        # Ensure refusal flag is strictly True
+        metrics["refused"] = True
+        metrics["refusal_reason"] = reason
+
+    # LOGGING: Ensure refusal is logged immediately
+    log_rag_run(query, "REFUSAL", [], dataset_hash, metrics)
+
+    return {
+        "query": query,
+        "answer": "I cannot answer this reliably with the available evidence (Refusal Triggered).",
+        "evidence": evidence,
+        "citations": [],
+        "metrics": metrics
+    }
+
 
 def format_evidence(evidence: List[dict]) -> str:
-    """
-    Formats evidence with simple integer IDs.
-    Example: [1] Text content...
-    """
     blocks = []
     for i, e in enumerate(evidence):
-        # 1-based indexing for the LLM
         blocks.append(f"[{i+1}] {e['text']}")
     return "\n\n".join(blocks)
 
@@ -90,19 +139,16 @@ def answer(
 ):
     logger = setup_logger(name="rag_answer", log_dir="./logs", level=logging.INFO)
     
-    # --- INITIALIZATION ---
     if retriever is None:
         retriever = Retriever(top_k=top_k)
     
-    # Reuse the embedding model from retriever for the attributor
     attributor = Attributor(retriever.model)
     checker = HallucinationChecker() 
     current_dataset_hash = compute_dataset_hash()
         
-    # --- RETRIEVAL ---
+    # --- 1. RETRIEVE & HYDRATE ---
     t0_retrieval = time.time()
     raw = retriever.search(query)
-    # print("RAW: \n", raw)
     retrieved_ids = [r["paper_id"] for r in raw.get("results", [])]
     
     retrieved = adapt_for_rag(raw["results"], query)
@@ -111,13 +157,24 @@ def answer(
     t1_retrieval = time.time()
     retrieval_latency = t1_retrieval - t0_retrieval
     
-    if len(evidence) < k_min:
-        # print("Evidence ", len(evidence))
-        return _construct_refusal(query, evidence, retrieval_latency, "Insufficient Information")
+    # Check 1: No Evidence / Min chunks (Authority Check)
+    # We create a dummy metrics dict for logging latency
+    base_metrics = {"retrieval_latency": retrieval_latency}
+    
+    should_refuse, reason = check_refusal(
+        retrieved_chunks=evidence,
+        alignment_details=[], 
+        confidence_score=0.0,
+        confidence_threshold=confidence_threshold,
+        min_distinct_papers=k_min
+    )
+    
+    # If refused purely on retrieval (e.g. empty), exit here
+    if should_refuse and not evidence:
+         return _construct_refusal(query, evidence, reason, current_dataset_hash, base_metrics)
 
     # --- PROMPT PREP ---
     evidence_text = format_evidence(evidence)
-    # print("Evidence Length: ", len(evidence_text))
     system_prompt = f"""
     You are a scholarly assistant.
     
@@ -131,7 +188,6 @@ def answer(
     {evidence_text}
     """
 
-    # --- GENERATION LOOP (MAX 3) ---
     MAX_RETRIES = 1
     attempt = 0
     current_prompt = f"{system_prompt}\n\nQuestion:\n{query}"
@@ -140,161 +196,97 @@ def answer(
     t0_llm = time.time()
     
     while attempt < MAX_RETRIES:
-        log_event(
-            logger = logger, 
-            level = logging.INFO, 
-            message = f"Generation Attempt {attempt + 1}"
-        )
+        log_event(logger=logger, level=logging.INFO, message=f"Generation Attempt {attempt + 1}")
         
+        # --- 2. GENERATE ---
         response = llm.generate(current_prompt)
         
-        # Check for Refusals
-        if "UNSUPPORTED" in response.lower() and len(response) < 100:
-            print("response: ", response)
-            return _construct_refusal(query, evidence, retrieval_latency, "Model Refused Content")
-             
         current_errors = []
-        sentences = []
         
-        metrics = {
-            "retrieval_latency": retrieval_latency, 
+        metrics = base_metrics.copy()
+        metrics.update({
             "llm_latency": 0.0, 
             "retrieved_chunks": len(evidence), 
             "refused": False, 
             "truncated": False, 
             "attempts": attempt + 1, 
             "total_sentences": 0, 
-            "unaligned_sentences": 0
-        }
-        # 1. Syntax Check (Format & Bounds)
+            "unaligned_sentences": 0,
+            "confidence_score": 0.0
+        })
+
+        # --- 3. SYNTAX CHECK ---
         syntax_result = checker.run_checks(response, evidence)
                 
         if not syntax_result["verification_passed"]:
              current_errors.extend(syntax_result["errors"])
         else:
-            # 2. Attribution Check (Semantic Similarity)
-            # Only run if syntax is valid to avoid parsing garbage
+            # --- 4. ATTRIBUTION (ALIGN) ---
             sentences = split_into_sentences(response)
             attr_result = attributor.verify(sentences, evidence, threshold=0.2)
             
+            # --- 5. TRUNCATE ---
             truncated_details = apply_strict_truncation(attr_result["details"])
-            response = reconstruct_final_answer(truncated_details)
             
             metrics["total_sentences"] = len(truncated_details)
             metrics["unaligned_sentences"] = len(attr_result["details"]) - len(truncated_details)
             metrics["truncated"] = len(attr_result["details"]) > len(truncated_details)
             
-            if not truncated_details:
-                _construct_refusal(query, evidence, retrieval_latency, "All content unsupported")
-                
-        # Pass or Retry?
+            # --- 6. CONFIDENCE SCORING ---
+            scorer = ConfidenceScorer()    
+            conf_metrics = scorer.calculate(
+                alignment_details = attr_result["details"],
+                retrieved_ids = retrieved_ids, 
+                relevant_papers=relevant_papers if relevant_papers is not None else [], 
+                k = top_k
+            )
+            metrics.update(conf_metrics)
+
+            # --- 7. REFUSAL CHECK (FINAL AUTHORITY) ---
+            should_refuse, reason = check_refusal(
+                retrieved_chunks=evidence,
+                alignment_details=attr_result["details"], # Use FULL details for check
+                confidence_score=metrics["confidence_score"],
+                confidence_threshold=confidence_threshold,
+                citation_precision=1.0, 
+                min_distinct_papers=k_min
+            )
+
+            if should_refuse:
+                return _construct_refusal(query, evidence, reason, current_dataset_hash, metrics)
+
         if not current_errors:
             # --- SUCCESS ---
-            t1_llm = time.time()
-        
-            metrics["retrieval_latency"] = retrieval_latency 
-            metrics["llm_latency"] = t1_llm - t0_llm
-            metrics["retrieved_chunks"] = len(evidence)
-            metrics["refused"] = False
-            metrics["attempts"] = attempt + 1
+            metrics["llm_latency"] = time.time() - t0_llm
             metrics["safety_check"] = "passed" 
-            metrics["total_sentences"] = len(sentences) 
-            metrics["unaligned_sentences"] = 0
             
-            if metrics["truncated"]:
-                log_event(
-                    logger = logger, 
-                    level = logging.WARNING, 
-                    message = f'TRUNCATION EVENT: Dropped {metrics["unaligned_sentences"]} sentences. Kept {metrics["total_sentences"]}.',
-                )
-            if eval_mode:
-                if relevant_papers is None:
-                    log_event(
-                        logger = logger, 
-                        level = logging.WARNING, 
-                        message = "Eval Mode enabled but no relevant Papers"
-                    )
-    
-                    relevant_papers = []
-                
-                scorer = ConfidenceScorer()    
-                conf_metrics = scorer.calculate(
-                    alignment_details = attr_result["details"], 
-                    retrieved_ids = retrieved_ids, 
-                    relevant_papers=relevant_papers, 
-                    k = top_k
-                )
-                current_confidence = conf_metrics["confidence_score"]
-                log_event(
-                    logger = logger, 
-                    level = logging.INFO, 
-                    message = f"Confidence Score: {current_confidence} (Threshold: {confidence_threshold})"
-                )
-                
-                if current_confidence < confidence_threshold:
-                    return _construct_refusal(
-                        query, 
-                        evidence, 
-                        retrieval_latency, 
-                        f"Low Confidence ({current_confidence:.2f} < {confidence_threshold})"
-                    )
-                
-                metrics.update(conf_metrics)
+            final_response = reconstruct_final_answer(truncated_details)
             
-            # Map integer indices back to real IDs
             real_citations = []
             for idx in syntax_result["cited_indices"]:
-                e = evidence[idx - 1] 
-                real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
+                if 1 <= idx <= len(evidence):
+                    e = evidence[idx - 1] 
+                    real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
 
-            if mode == "synthesis" and not response.strip().lower().startswith("synthesis"):
-                response = "SYNTHESIS: " + response
-                
+            if mode == "synthesis" and not final_response.strip().lower().startswith("synthesis"):
+                final_response = "SYNTHESIS: " + final_response
             
-            log_rag_run(query, response, real_citations, current_dataset_hash, metrics)
+            log_rag_run(query, final_response, real_citations, current_dataset_hash, metrics)
             
             return {
                 "query": query,
-                "answer": response,
+                "answer": final_response,
                 "citations": real_citations, 
                 'metrics': metrics
             }
         
-        # --- FAILURE: PREPARE RETRY ---
         error_msg = "; ".join(current_errors)
-        log_event(
-            logger = logger, 
-            level = logging.WARNING, 
-            message = f"Attempt {attempt + 1} failed: {error_msg}"
-        )
+        log_event(logger=logger, level=logging.WARNING, message=f"Attempt {attempt + 1} failed: {error_msg}")
         current_prompt += f"\n\nPREVIOUS RESPONSE REJECTED. REASON: {error_msg}. \nREWRITE CORRECTLY USING [index]."
         attempt += 1
 
-    # --- FINAL REFUSAL ---
-    log_event(
-        logger = logger, 
-        level = logging.ERROR, 
-        message = "Max retries reached. Refusing answer."
-    )
-    return _construct_refusal(query, evidence, retrieval_latency, "Max Retries Failed")
-
-
-def _construct_refusal(query, evidence, ret_latency, reason):
-    return {
-        "query": query,
-        "answer": "I cannot answer this reliably with the available evidence (Verification Failed).",
-        "evidence": evidence,
-        "citations": [],
-        "metrics": {
-            "retrieval_latency": ret_latency,
-            "llm_latency": 0.0,
-            "retrieved_chunks": len(evidence),
-            "refused": True,
-            "refusal_reason": reason, 
-            "total_sentences": 0, 
-            "unaligned_sentences": 0
-        }
-    }
+    # --- FINAL REFUSAL (MAX RETRIES) ---
+    return _construct_refusal(query, evidence, "Max Retries Failed", current_dataset_hash, metrics)
 
 if __name__ == "__main__":
     with open(r"pipelines\evaluation\data\eval_queries.json", encoding="utf-8") as f:
@@ -311,7 +303,6 @@ if __name__ == "__main__":
     )
     print(json.dumps(results, indent=2))
     
-    # Case 2: Normal Mode (Should proceed despite low confidence underlying)
     print("\n--- NORMAL MODE ---")
     results = answer(
         query, 

@@ -92,6 +92,7 @@ def query(
             llm_latency = result.get("metrics", {}).get("llm_latency", 0.0), 
             retrieved_chunks = result.get("metrics", {}).get("retrieved_chunks", 0),
             refused = 1 if result.get("metrics", {}).get("refused", False) else 0,
+            refusal_reason = result.get("metrics", {}).get("refusal_reason"),
             confidence_score = result.get("metrics", {}).get("confidence_score", 0.0), 
             truncated = result.get("metrics", {}).get(f"truncated", False), 
             dropped_sentences = result.get("metrics", {}).get("unaligned_sentences", 0)

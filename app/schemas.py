@@ -20,6 +20,7 @@ class QueryMetrics(BaseModel):
     llm_latency: float
     retrieved_chunks: int
     refused: int
+    refusal_reason: Optional[str] = None
     confidence_score: float = 0.0
     truncated: bool = False
     dropped_sentences: int = 0

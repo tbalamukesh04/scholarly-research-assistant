@@ -1,14 +1,12 @@
 sources: 
   arxiv: 
     enabled: true
-    categories: ["cs.AI"]
-    # max_papers: 1000 
-    max_papers: 50
+    categories: ["cs.AI", "cs.LG", "cs.CL"]
+    max_papers: 3000
     
   pmc:
     enabled: true
-    # max_papers: 1000
-    max_papers: 50
+    max_papers: 1000
     sleep_records : 0.5
     terms: ["artificial intelligence"]
   

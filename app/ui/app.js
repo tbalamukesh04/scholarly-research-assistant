@@ -25,8 +25,9 @@ async function submitQuery() {
   
     const data = await res.json();
     
-    const isRefusal = (data.metrics && data.metrics.refused_count > 0) || 
-                      (data.answer && data.answer.includes("cannot answer"));
+    const isRefusal = (data.metrics && data.metrics.refused_count == 1) ||
+                      (data.answer && data.answer.includes("Refusal Triggered")) ||
+                      (data.answer && data.answer.includes("Answer Refused"));
     
     const isTruncated = data.metrics && data.metrics.truncated;
     
@@ -34,7 +35,7 @@ async function submitQuery() {
     
     if (isRefusal) {
       responseBox.className = "refusal";
-      responseBox.innerText = data.answer ?? "No Answer Found.";
+      responseBox.innerText = data.answer ?? "Answer Refused (Unknown Reason).";
     } else {
       responseBox.className = "success";
       
@@ -44,7 +45,7 @@ async function submitQuery() {
       if (isTruncated) {
         const warningDiv = document.createElement("div");
         warningDiv.className = "trunction-warning";
-        warning.warningDiv.innerText = `[WARNING] Answer Truncated due to weak evidence. (${data.metrics.dropped_sentences}) sentences dropped`;
+        warningDiv.innerText = `[WARNING] Answer Truncated due to weak evidence. (${data.metrics.dropped_sentences}) sentences dropped`;
         responseBox.appendChild(warningDiv);
       }
     }
