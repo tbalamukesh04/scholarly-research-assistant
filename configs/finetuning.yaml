@@ -1,0 +1,51 @@
+project:
+   name: "qwen-2.5-7b-instruct-tuning"
+   owner: "Tejas Balamukesh"
+   version: "v1.0.0"
+   seed: 42
+   
+model:
+  base_model_id: "Qwen/Qwen2.5-7B-Instruct"
+  target_modules:
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+  torch_dtype: "float16"
+  max_seq_length: 4096
+
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_compute_type: "float16"
+  bnb_4bit_use_double_quant: true
+ 
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CASUAL_LM"
+ 
+data: 
+  train_path: "./data/train.jsonl"
+  val_path: "./data/val.jsonl"
+  
+training:
+   output_dir: "./adapters/v1.0.0"
+   num_train_epochs: 1
+   per_device_train_batch_size: 2
+   gradient_accumulation_steps: 4
+   learning_rate: 0.0002
+   weight_decay: 0.001
+   optim: "paged_adamw_32bit"
+   logging_steps: 10
+   save_strategy: "epoch"
+   evaluation_strategy: "steps"
+   eval_steps: 50
+   warmup_ratio: 0.03
+   lr_scheduler_type: "cosine"
+   report_to: "none"
