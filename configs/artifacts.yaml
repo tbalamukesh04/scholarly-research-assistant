@@ -1,0 +1,74 @@
+system_version: "1.0.0-frozen"
+hashing_utility: "utils.helper_functions.hash_object"
+
+artifacts:
+  # -----------------------------------------------------------------------------
+  # CATEGORY 1: DATA FOUNDATION (Immutable Storage)
+  # -----------------------------------------------------------------------------
+  raw_pdfs:
+    description: "Original PDF inputs"
+    path: "data/raw"
+    type: "deterministic"
+    storage: "dvc"
+    regeneration_rule: "manual_ingest"
+
+  processed_chunks:
+    description: "Cleaned and chunked text"
+    path: "data/processed/chunks"
+    type: "deterministic"
+    storage: "dvc"
+    regeneration_rule: "pipelines/processing/extracting_and_chunking_pdfs.py"
+    metadata_path: "data/versions/dataset_metadata.json" # Contains the canonical hash
+
+  faiss_index:
+    description: "Vector search index"
+    path: "data/indexes/index_manifest.json"
+    type: "deterministic"
+    storage: "local"
+    regeneration_rule: "scripts/write_index_manifest.py"
+    dependencies: ["processed_chunks", "embedding_model"]
+
+  # -----------------------------------------------------------------------------
+  # CATEGORY 2: LOGIC CORE (Versioned Code)
+  # -----------------------------------------------------------------------------
+  prompts:
+    description: "RAG Prompt Templates"
+    path: "pipelines/rag/answer.py"
+    type: "code_artifact"
+    storage: "git"
+    hashing_strategy: "file_hash"
+
+  splitting_logic:
+    description: "Train/Test Split Definitions"
+    path: "data/versions/dataset_manifest.json"
+    type: "deterministic"
+    storage: "git"
+    regeneration_rule: "scripts/gen_splits.py"
+
+  # -----------------------------------------------------------------------------
+  # CATEGORY 3: EVALUATION & SYNTHETIC DATA (Frozen Stochasticity)
+  # -----------------------------------------------------------------------------
+  synthetic_qa:
+    description: "Generated QA pairs for training/eval"
+    path: "data/synthetic"
+    type: "frozen_stochastic"
+    storage: "dvc"
+    regeneration_rule: "scripts/generate_data/4_batch_synthesize.py"
+
+  golden_answers:
+    description: "Regression baseline answers"
+    path: "pipelines/rag/answers.json"
+    type: "frozen_stochastic"
+    storage: "git"
+    regeneration_rule: "manual_curation"
+
+  experiment_logs:
+    description: "Run history"
+    path: "mlflow.db"
+    type: "log"
+    storage: "local"
+    
+required_metadata:
+  - dataset_hash
+  - git_commit
+  - config_snapshot

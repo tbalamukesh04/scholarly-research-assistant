@@ -11,8 +11,14 @@
 
 import hashlib
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Add project root to path to allow imports
+sys.path.append(str(Path(__file__).parents[1]))
+
+from utils.helper_functions import get_deterministic_json_bytes
 
 metadata_PATH = Path("data/versions/dataset_metadata.json")
 CHUNKS_DIR = Path("data/processed/chunks")
@@ -35,7 +41,8 @@ def compute_dataset_hash() -> str:
                 for sec in data["sections"]
             ],
         }
-        h.update(json.dumps(payload, sort_keys=True).encode("utf-8"))
+        # Use centralized deterministic bytes
+        h.update(get_deterministic_json_bytes(payload))
 
     return h.hexdigest()
 
