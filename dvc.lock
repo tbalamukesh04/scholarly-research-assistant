@@ -1,0 +1,58 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: python -m pipelines.ingestion.arxiv_pdf_acquire && python -m 
+      pipelines.ingestion.pmc_pdf_acquire
+    deps:
+    - path: pipelines/ingestion/arxiv_pdf_acquire.py
+      hash: md5
+      md5: 694a443188e8e59b25d6a92b5a14a514
+      size: 4256
+    - path: pipelines/ingestion/pmc_pdf_acquire.py
+      hash: md5
+      md5: 61542bc67053d844b904306f45c8af3c
+      size: 7252
+    params:
+      params.yaml:
+        ingestion:
+          arxiv:
+            enabled: true
+            categories:
+            - cs.AI
+            - cs.LG
+            - cs.CL
+            max_papers: 3000
+          pmc:
+            enabled: true
+            max_papers: 1000
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+  process:
+    cmd: python -m pipelines.processing.extracting_and_chunking_pdfs --input_dir
+      data/raw/pdfs --output_dir data/chunks
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: pipelines/processing/extracting_and_chunking_pdfs.py
+      hash: md5
+      md5: ee97d6ce859997b6128314ece68a4799
+      size: 5294
+    params:
+      params.yaml:
+        processing:
+          chunk_size: 1000
+          chunk_overlap: 200
+          min_length: 50
+    outs:
+    - path: data/chunks
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0

@@ -1,0 +1,44 @@
+# Mirror of configs/project.yaml
+base:
+  project: scholarly-research-assistant
+  seed: 42
+
+paths:
+  data: data/
+  raw: data/raw
+  processed: data/processed
+  chunks: data/chunks
+  indexes: data/indexes
+  eval: data/eval
+  models: models/
+
+# Mirror of configs/ingestion.yaml
+ingestion:
+  arxiv:
+    enabled: true
+    categories: 
+      - "cs.AI"
+      - "cs.LG"
+      - "cs.CL"
+    max_papers: 3000
+  pmc:
+    enabled: true
+    max_papers: 1000
+
+# Processing Parameters (New Control Surface)
+processing:
+  chunk_size: 1000
+  chunk_overlap: 200
+  min_length: 50
+
+# Embedding & Indexing
+indexing:
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  dimension: 384
+  index_type: "IDMap,Flat"
+
+# Evaluation
+evaluation:
+  k: 5
+  guardrail_threshold: 0.7
+  samples: 50

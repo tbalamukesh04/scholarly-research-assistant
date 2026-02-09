@@ -1,0 +1,51 @@
+stages:
+  ingest:
+    # UPDATED: Runs metadata ingestion FIRST, then PDF acquisition
+    cmd: >
+      python -m pipelines.ingestion.arxiv_metadata_ingest &&
+      python -m pipelines.ingestion.pmc_metadata_ingest &&
+      python -m pipelines.ingestion.arxiv_pdf_acquire &&
+      python -m pipelines.ingestion.pmc_pdf_acquire
+    deps:
+      - pipelines/ingestion/arxiv_metadata_ingest.py
+      - pipelines/ingestion/pmc_metadata_ingest.py
+      - pipelines/ingestion/arxiv_pdf_acquire.py
+      - pipelines/ingestion/pmc_pdf_acquire.py
+    params:
+      - ingestion
+    outs:
+      - data/raw
+
+  process:
+    cmd: python -m pipelines.processing.extracting_and_chunking_pdfs --input_dir data/raw/pdfs --output_dir data/chunks
+    deps:
+      - pipelines/processing/extracting_and_chunking_pdfs.py
+      - data/raw
+    params:
+      - processing
+    outs:
+      - data/chunks
+
+  embed:
+    cmd: python -m pipelines.processing.build_embeddings_and_faiss --input_dir data/chunks --output_dir data/indexes
+    deps:
+      - pipelines/processing/build_embeddings_and_faiss.py
+      - data/chunks
+    params:
+      - indexing
+    outs:
+      - data/indexes
+
+  evaluate:
+    cmd: python -m evaluation.evaluate
+    deps:
+      - evaluation/evaluate.py
+      - data/indexes
+      - pipelines/evaluation/data/eval_queries.json
+    params:
+      - evaluation
+    metrics:
+      - evaluation/metrics.json:
+          cache: false
+    outs:
+      - evaluation/results/

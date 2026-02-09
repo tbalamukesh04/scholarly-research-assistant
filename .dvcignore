@@ -1,3 +1,19 @@
-# Add patterns of files dvc should ignore, which could improve
-# the performance. Learn more at
-# https://dvc.org/doc/user-guide/dvcignore
+# Python & Environment
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Logs & Metrics
+logs/
+mlruns/
+.mlflow/
+
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary Data
+data/tmp/
