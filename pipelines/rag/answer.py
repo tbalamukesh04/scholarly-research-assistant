@@ -4,7 +4,10 @@ import os
 from typing import List, Optional, Dict, Any
 import time
 
-import mlflow
+from utils.mlflow_handler import MLflowHandler 
+from utils.mlflow_schema import RunType 
+from utils.metadata import get_git_commit, get_index_hash, PROMPT_VERSION, GUARDRAIL_VERSION
+
 from google import genai
 
 from pipelines.postprocess.truncate import apply_strict_truncation, reconstruct_final_answer
@@ -39,60 +42,53 @@ class LLM:
 
 def log_rag_run(query, answer, citations, dataset_hash, metrics):
     """
-    Logs the RAG query execution to MLflow.
-    Captures refusal reasons and confidence scores explicitly.
+    Logs the RAG query execution to MLflow via MLflowHandler.
+    Now adheres to Strict Schema with real lineage data.
     """
-    with mlflow.start_run(run_name="rag_query", nested=True):
-        mlflow.log_param("query", query)
-        mlflow.log_param("dataset_hash", dataset_hash)
-        
-        # Log Refusal Reason if it exists
-        if metrics.get("refusal_reason"):
-             mlflow.log_param("refusal_reason", metrics["refusal_reason"])
-
-        mlflow.log_metric("num_citations", len(citations))
-        mlflow.log_metric("total_sentences", metrics.get("total_sentences", 0))
-        mlflow.log_metric("unaligned_sentences", metrics.get("unaligned_sentences", 0))
-        mlflow.log_metric("truncated", int(metrics.get("truncated", False)))
-        mlflow.log_metric("refused", int(metrics.get("refused", False)))
-        mlflow.log_metric("retrieval_latency", metrics.get("retrieval_latency", 0.0))
-        
-        # Log Confidence & Retrieval Metrics if available
-        if "confidence_score" in metrics:
-            mlflow.log_metric("confidence_score", metrics["confidence_score"])
-        if "alignment_score" in metrics:
-            mlflow.log_metric("alignment_score", metrics["alignment_score"])
-        if "recall_score" in metrics:
-            mlflow.log_metric("recall_score", metrics["recall_score"])
+    tags = {
+        "dataset_hash": dataset_hash,
+        "query": query,
+        "index_hash": get_index_hash(),
+        "prompt_version": PROMPT_VERSION,
+        "guardrail_version": GUARDRAIL_VERSION,
+        "git_commit": get_git_commit(),
+        "run_type": RunType.GUARDRAIL.value # Explicitly set for tag validation
+    }
+    
+    # We use RunType.GUARDRAIL as the primary type for RAG answers 
+    # because it includes refusal/confidence checks.
+    with MLflowHandler.start_run(
+        run_name="rag_query", 
+        run_type=RunType.GUARDRAIL, 
+        tags=tags, 
+        nested=True
+    ):
+        MLflowHandler.log_metrics(RunType.GUARDRAIL, metrics)
 
 
 def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None):
     """
     Constructs the refusal response and logs it to MLflow.
-    Merges prior_metrics (e.g. confidence) to ensure we know WHY it was refused.
     """
-    # Base metrics for a refusal
     metrics = {
         "retrieval_latency": 0.0,
         "llm_latency": 0.0,
-        "retrieved_chunks": len(evidence) if evidence else 0,
-        "refused": True,
-        "refusal_reason": reason, 
-        "total_sentences": 0, 
-        "unaligned_sentences": 0,
-        "confidence_score": 0.0, # Default, overwritten by prior_metrics if present
+        "refusal_triggered": 1.0,
+        "num_total_sentences": 0, 
+        "confidence_score": 0.0, 
         "alignment_score": 0.0,
-        "recall_score": 0.0
+        "recall_score": 0.0,
+        "num_supported_sentences": 0
     }
     
-    # Merge any calculated metrics (e.g. latency, confidence)
     if prior_metrics:
         metrics.update(prior_metrics)
-        # Ensure refusal flag is strictly True
-        metrics["refused"] = True
-        metrics["refusal_reason"] = reason
+        metrics["refusal_triggered"] = 1.0
 
-    # LOGGING: Ensure refusal is logged immediately
+    # Ensure refusal reason is available for inspection (logged as param if needed, but not metric)
+    # Note: MLflowHandler tags handle the schema, we can add ad-hoc params if we want,
+    # but for now we stick to the required tags.
+    
     log_rag_run(query, "REFUSAL", [], dataset_hash, metrics)
 
     return {
@@ -157,8 +153,6 @@ def answer(
     t1_retrieval = time.time()
     retrieval_latency = t1_retrieval - t0_retrieval
     
-    # Check 1: No Evidence / Min chunks (Authority Check)
-    # We create a dummy metrics dict for logging latency
     base_metrics = {"retrieval_latency": retrieval_latency}
     
     should_refuse, reason = check_refusal(
@@ -169,7 +163,6 @@ def answer(
         min_distinct_papers=k_min
     )
     
-    # If refused purely on retrieval (e.g. empty), exit here
     if should_refuse and not evidence:
          return _construct_refusal(query, evidence, reason, current_dataset_hash, base_metrics)
 
@@ -206,13 +199,10 @@ def answer(
         metrics = base_metrics.copy()
         metrics.update({
             "llm_latency": 0.0, 
-            "retrieved_chunks": len(evidence), 
-            "refused": False, 
-            "truncated": False, 
-            "attempts": attempt + 1, 
-            "total_sentences": 0, 
-            "unaligned_sentences": 0,
-            "confidence_score": 0.0
+            "refusal_triggered": 0.0, 
+            "num_total_sentences": 0, 
+            "confidence_score": 0.0,
+            "num_supported_sentences": 0
         })
 
         # --- 3. SYNTAX CHECK ---
@@ -228,9 +218,8 @@ def answer(
             # --- 5. TRUNCATE ---
             truncated_details = apply_strict_truncation(attr_result["details"])
             
-            metrics["total_sentences"] = len(truncated_details)
-            metrics["unaligned_sentences"] = len(attr_result["details"]) - len(truncated_details)
-            metrics["truncated"] = len(attr_result["details"]) > len(truncated_details)
+            metrics["num_total_sentences"] = len(truncated_details)
+            metrics["num_supported_sentences"] = len([d for d in truncated_details if d["verification_status"] == "supported"])
             
             # --- 6. CONFIDENCE SCORING ---
             scorer = ConfidenceScorer()    
@@ -240,13 +229,15 @@ def answer(
                 relevant_papers=relevant_papers if relevant_papers is not None else [], 
                 k = top_k
             )
+            # Filter metrics to only those allowed by schema (or rely on update overriding)
+            # The schema validator will catch if scorer returns something wild.
             metrics.update(conf_metrics)
 
             # --- 7. REFUSAL CHECK (FINAL AUTHORITY) ---
             should_refuse, reason = check_refusal(
                 retrieved_chunks=evidence,
-                alignment_details=attr_result["details"], # Use FULL details for check
-                confidence_score=metrics["confidence_score"],
+                alignment_details=attr_result["details"], 
+                confidence_score=metrics.get("confidence_score", 0.0),
                 confidence_threshold=confidence_threshold,
                 citation_precision=1.0, 
                 min_distinct_papers=k_min
@@ -258,7 +249,6 @@ def answer(
         if not current_errors:
             # --- SUCCESS ---
             metrics["llm_latency"] = time.time() - t0_llm
-            metrics["safety_check"] = "passed" 
             
             final_response = reconstruct_final_answer(truncated_details)
             
@@ -285,7 +275,6 @@ def answer(
         current_prompt += f"\n\nPREVIOUS RESPONSE REJECTED. REASON: {error_msg}. \nREWRITE CORRECTLY USING [index]."
         attempt += 1
 
-    # --- FINAL REFUSAL (MAX RETRIES) ---
     return _construct_refusal(query, evidence, "Max Retries Failed", current_dataset_hash, metrics)
 
 if __name__ == "__main__":
@@ -298,14 +287,7 @@ if __name__ == "__main__":
     results = answer(
         query, 
         eval_mode=True, 
-        relevant_papers=relevant_papers, # Empty list = 0 recall -> Low confidence
+        relevant_papers=relevant_papers,
         confidence_threshold=0.8 
-    )
-    print(json.dumps(results, indent=2))
-    
-    print("\n--- NORMAL MODE ---")
-    results = answer(
-        query, 
-        eval_mode=False
     )
     print(json.dumps(results, indent=2))
