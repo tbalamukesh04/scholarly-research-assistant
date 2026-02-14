@@ -1,0 +1,57 @@
+name: CI / Reproducibility Verification
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  verify-integrity:
+    runs-on: ubuntu-latest
+    env:
+      # Required for the LLM/Guardrail stages in the pipeline
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install dvc mlflow google-genai sentence-transformers faiss-cpu numpy pandas
+
+      # ------------------------------------------------------------------------
+      # STEP 5: DVC Reproducibility Check
+      # ------------------------------------------------------------------------
+      - name: DVC Pipeline Reproduction
+        run: |
+          dvc repro
+
+      - name: Verify Pipeline Integrity (Drift Check)
+        run: |
+          git diff --exit-code
+
+      # ------------------------------------------------------------------------
+      # STEP 6: Determinism & Lineage Verification
+      # ------------------------------------------------------------------------
+      - name: Run Determinism & Lineage Checks
+        run: |
+          chmod +x scripts/verify_repro.sh
+          ./scripts/verify_repro.sh
+
+      # ------------------------------------------------------------------------
+      # STEP 7: Registry Gate Enforcement
+      # ------------------------------------------------------------------------
+      - name: Registry Promotion Gate
+        run: |
+          # Block merge if evaluation artifacts are missing
+          python scripts/check_gate.py
+      

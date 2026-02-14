@@ -2,7 +2,7 @@ sources:
   arxiv: 
     enabled: true
     categories: ["cs.AI", "cs.LG", "cs.CL"]
-    max_papers: 50
+    max_papers: 50y_
     
   pmc:
     enabled: true
