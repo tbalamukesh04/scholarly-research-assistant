@@ -1,16 +1,12 @@
 stages:
   ingest:
-    # UPDATED: Runs metadata ingestion FIRST, then PDF acquisition
+    # REMOVED: PMC ingestion steps
     cmd: >
       python -m pipelines.ingestion.arxiv_metadata_ingest &&
-      python -m pipelines.ingestion.pmc_metadata_ingest &&
-      python -m pipelines.ingestion.arxiv_pdf_acquire &&
-      python -m pipelines.ingestion.pmc_pdf_acquire
+      python -m pipelines.ingestion.arxiv_pdf_acquire
     deps:
       - pipelines/ingestion/arxiv_metadata_ingest.py
-      - pipelines/ingestion/pmc_metadata_ingest.py
       - pipelines/ingestion/arxiv_pdf_acquire.py
-      - pipelines/ingestion/pmc_pdf_acquire.py
     params:
       - ingestion
     outs:

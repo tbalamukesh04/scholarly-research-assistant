@@ -3,12 +3,6 @@ sources:
     enabled: true
     categories: ["cs.AI", "cs.LG", "cs.CL"]
     max_papers: 50
-    
-  pmc:
-    enabled: true
-    max_papers: 1000
-    sleep_records : 0.5
-    terms: ["artificial intelligence"]
   
 storage:
   raw_pdf_dir: data/raw/pdfs

@@ -21,9 +21,6 @@ ingestion:
       - "cs.LG"
       - "cs.CL"
     max_papers: 3000
-  pmc:
-    enabled: true
-    max_papers: 1000
 
 # Processing Parameters (New Control Surface)
 processing:
