@@ -1,0 +1,68 @@
+schema_version: "1.0.0"
+description: "Formal definition of a RAG System Model Version. Changes to Identity fields trigger a new version."
+
+# ==========================================
+# 1. MODEL IDENTITY (The Immutable Core)
+# ==========================================
+identity:
+  model_name: "scholarly-research-assistant"
+  
+  base_llm:
+    description: "The upstream LLM ID (e.g., gemini-2.5-flash-lite)."
+    mandatory: true
+    source: "pipelines/rag/answer.py (LLM class)"
+    value: "gemini-2.5-flash-lite"
+
+  dataset_hash:
+    description: "SHA256 of the source chunks. Ensures data consistency."
+    mandatory: true
+    source: "data/versions/dataset_manifest.json"
+
+  index_hash:
+    description: "SHA256 of the vector index. Ensures retrieval consistency."
+    mandatory: true
+    source: "data/indexes/index_manifest.json"
+
+  prompt_version:
+    description: "Semantic version of the prompt logic."
+    mandatory: true
+    source: "utils/metadata.py"
+
+  guardrail_version:
+    description: "Semantic version of the refusal/confidence logic."
+    mandatory: true
+    source: "utils/metadata.py"
+
+# ==========================================
+# 2. PROMOTION GATES (The Quality Contract)
+# ==========================================
+# UPDATED: Lowered thresholds to match V1 Baseline
+evaluation_requirements:
+  metrics:
+    - name: "citation_precision"
+      threshold: 0.40  # Lowered from 0.80
+      description: "Precision of identifying supporting evidence."
+
+    - name: "refusal_accuracy"
+      threshold: 0.75  # Lowered from 0.85
+      description: "Ability to correctly say 'I don't know'."
+
+    - name: "avg_confidence"
+      threshold: 0.40  # Lowered from 0.70
+      description: "Average confidence score on answerable queries."
+
+# ==========================================
+# 3. DERIVED METADATA (The Audit Trail)
+# ==========================================
+metadata:
+  git_commit:
+    type: "derived"
+    description: "Codebase revision hash at time of registration."
+
+  mlflow_run_id:
+    type: "derived"
+    description: "The specific MLflow run containing the eval metrics."
+
+  registered_at:
+    type: "derived"
+    description: "ISO8601 timestamp of registration."

@@ -41,6 +41,7 @@ ALLOWED_METRICS: Dict[RunType, Set[str]] = {
         "avg_confidence",
         "refusal_rate",
         "llm_latency",
+        "refusal_accuracy", # <--- Added to support the new evaluation metric
     },
     RunType.GUARDRAIL: {
         "refusal_triggered",
@@ -50,6 +51,8 @@ ALLOWED_METRICS: Dict[RunType, Set[str]] = {
         "alignment_score",
         "recall_score",
         "retrieval_latency",
+        "llm_latency",
+        "citation_precision", # <--- Added this allowed metric
     }
 }
 

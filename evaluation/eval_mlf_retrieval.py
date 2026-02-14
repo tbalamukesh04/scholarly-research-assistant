@@ -8,10 +8,7 @@ def evaluate_retrieval(queries, retriever_type="dense", k=10):
     """
     Runs retrieval evaluation and returns schema-compliant metrics + artifact path.
     """
-    # Initialize Retriever
-    retriever = Retriever(top_k=k) # Assuming retriever handles type internally or via config
-    # Note: If retriever_type affects initialization, adjust accordingly. 
-    # For now, we assume standard Retriever.
+    retriever = Retriever(top_k=k)
     
     results = []
     precisions = []
@@ -22,16 +19,21 @@ def evaluate_retrieval(queries, retriever_type="dense", k=10):
     
     for q in queries:
         query_text = q["query"]
-        relevant_ids = set(q["relevant_papers"])
+        # Convert to list for compatibility
+        relevant_ids = list(set(q["relevant_papers"]))
         
         # Search
         search_res = retriever.search(query_text)
-        retrieved_ids = [r["paper_id"] for r in search_res["results"]]
+        retrieved_items = search_res["results"]
+        retrieved_ids = [r["paper_id"] for r in retrieved_items]
         
         # Calculate Metrics
-        p_k = precision_at_k(relevant_ids, retrieved_ids, k=k)
-        r_k = recall_at_k(relevant_ids, retrieved_ids, k=k)
-        mrr = reciprocal_rank(relevant_ids, retrieved_ids, k=k)
+        # Passing 'retrieved_items' (List[Dict]) not 'retrieved_ids'
+        p_k = precision_at_k(retrieved_items, relevant_ids, k=k)
+        r_k = recall_at_k(retrieved_items, relevant_ids, k=k)
+        
+        # MRR (Slice input to k)
+        mrr = reciprocal_rank(retrieved_items[:k], relevant_ids)
         
         precisions.append(p_k)
         recalls.append(r_k)
@@ -39,22 +41,22 @@ def evaluate_retrieval(queries, retriever_type="dense", k=10):
         
         results.append({
             "query": query_text,
-            "relevant_ids": str(list(relevant_ids)),
+            "relevant_ids": str(relevant_ids),
             "retrieved_ids": str(retrieved_ids),
             "precision_at_k": p_k,
             "recall_at_k": r_k,
             "mrr": mrr
         })
 
-    # 1. Aggregate Metrics (Schema Compliant Names)
+    # 1. Aggregate Metrics
     metrics = {
-        "precision_at_k": np.mean(precisions),
-        "recall_at_k": np.mean(recalls),
-        "mrr": np.mean(mrrs),
-        "num_chunks_retrieved": float(k) # Cast to float for MLflow
+        "precision_at_k": np.mean(precisions) if precisions else 0.0,
+        "recall_at_k": np.mean(recalls) if recalls else 0.0,
+        "mrr": np.mean(mrrs) if mrrs else 0.0,
+        "num_chunks_retrieved": float(k)
     }
     
-    # 2. Save Artifact (CSV)
+    # 2. Save Artifact
     os.makedirs("evaluation/results", exist_ok=True)
     artifact_path = f"evaluation/results/retrieval_{retriever_type}.csv"
     df = pd.DataFrame(results)

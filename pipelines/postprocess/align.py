@@ -62,7 +62,9 @@ class Attributor:
                 "sentence": sent, 
                 "max_score": max_score, 
                 "supported_by_chunk_index": int(best_idx) if supported else None, 
-                "supported": supported
+                "supported": supported,
+                # Fix: Add the key required by answer.py
+                "verification_status": "supported" if supported else "unsupported"
             }
             results.append(record)
             
