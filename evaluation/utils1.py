@@ -1,7 +1,14 @@
 import json
+from pathlib import Path
 
 def load_queries():
-    with open("data/evaluation/eval_queries.json", "r", encoding="utf-8") as f:
+    # UPDATED: Correct path matching the project structure
+    path = Path("pipelines/evaluation/data/eval_queries.json")
+    
+    if not path.exists():
+        raise FileNotFoundError(f"Evaluation queries not found at {path}")
+        
+    with open(path, "r", encoding="utf-8") as f:
         queries = json.load(f)
         
     return queries

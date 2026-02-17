@@ -1,7 +1,7 @@
 {
   "dataset_name": "scholarly-research-assistant",
-  "dataset_hash": "sha256:09a80bb4edc5a744d52ff4b265fee3bb31332d1af442301bffad096063425149",
-  "created_at": "2026-01-02T07:39:10.155045+00:00",
+  "dataset_hash": "sha256:6f94395e089cf53b9ea34b61427532c280775bc82aa82e8d4eb9e1eb5709059f",
+  "created_at": "2026-02-16T19:34:49.885404+00:00",
   "includes": [
     "data/processed/chunks/*.json"
   ],

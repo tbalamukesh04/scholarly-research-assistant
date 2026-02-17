@@ -1,0 +1,14 @@
+{
+"timestamp": "2026-02-15T22:12:35Z",
+"system_identity": {
+"dataset_hash": "sha256:5f63680c33f7ed6539bcf81da80e02e26665134d4e2ebb363b51d5e8401f398b",
+"index_directory_hash": "9a5d6a51c883d12a9279463a22844f42.dir",
+"pipeline_lock_hash": "402ebdc4af4cd58d8104e8218ea31d7"},
+"current_metrics": {
+"precision_at_k": 0.22,
+"citation_precision": null,
+"refusal_accuracy": null,
+"avg_confidence":null},
+"runtime_context":{
+"dvc_stage_ingest": "1b6667860006a563d2d2c893f902e108.dir",
+"dvc_stage_process": "0e088d3d0cb50aae8f004a474d69c8dc.dir"}}

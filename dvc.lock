@@ -29,7 +29,7 @@ stages:
       nfiles: 100
   process:
     cmd: python -m pipelines.processing.extracting_and_chunking_pdfs --input_dir
-      data/raw/pdfs --output_dir data/chunks
+      data/raw/pdfs --output_dir data/processed/chunks
     deps:
     - path: data/raw
       hash: md5
@@ -47,16 +47,16 @@ stages:
           chunk_overlap: 200
           min_length: 50
     outs:
-    - path: data/chunks
+    - path: data/processed/chunks
       hash: md5
       md5: 0e088d3d0cb50aae8f004a474d69c8dc.dir
       size: 4505595
       nfiles: 50
   embed:
     cmd: python -m pipelines.processing.build_embeddings_and_faiss --input_dir 
-      data/chunks --output_dir data/indexes
+      data/processed/chunks --output_dir data/processed/faiss
     deps:
-    - path: data/chunks
+    - path: data/processed/chunks
       hash: md5
       md5: 0e088d3d0cb50aae8f004a474d69c8dc.dir
       size: 4505595
@@ -72,19 +72,19 @@ stages:
           dimension: 384
           index_type: IDMap,Flat
     outs:
-    - path: data/indexes
+    - path: data/processed/faiss
       hash: md5
-      md5: 9a5d6a51c883d12a9279463a22844f42.dir
-      size: 12082173
-      nfiles: 3
+      md5: cb9665822c4e8e3d7df376cf6a4837bd.dir
+      size: 12081476
+      nfiles: 2
   evaluate:
     cmd: python -m evaluation.evaluate
     deps:
-    - path: data/indexes
+    - path: data/processed/faiss
       hash: md5
-      md5: 9a5d6a51c883d12a9279463a22844f42.dir
-      size: 12082173
-      nfiles: 3
+      md5: cb9665822c4e8e3d7df376cf6a4837bd.dir
+      size: 12081476
+      nfiles: 2
     - path: evaluation/evaluate.py
       hash: md5
       md5: fa730ee57ccfb0619ea07b6750253591
@@ -102,10 +102,10 @@ stages:
     outs:
     - path: evaluation/metrics.json
       hash: md5
-      md5: 402ebdc4af4cd58d81046e8218ea31d7
-      size: 30
+      md5: 5c3735b568be9e5b3976245246806195
+      size: 29
     - path: evaluation/results/
       hash: md5
-      md5: c9301d62d46c41cab5324ce9698415ab.dir
+      md5: ef9d9b9677d547f1b224d427467a5554.dir
       size: 9863
       nfiles: 1

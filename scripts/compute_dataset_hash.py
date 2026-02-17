@@ -1,33 +1,30 @@
-# Return Format:
-#     {
-#         "dataset_name": str,
-#         "dataset_hash": str,
-#         "created_at": datetime,
-#         'includes': List[str],
-#         "excludes": List[str],
-#         "chunking": Dict,
-#         "embedding":Dict,
-#     }
-
 import hashlib
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Add project root to path to allow imports
+# Add project root to path
 sys.path.append(str(Path(__file__).parents[1]))
 
 from utils.helper_functions import get_deterministic_json_bytes
 
-metadata_PATH = Path("data/versions/dataset_metadata.json")
+# UPDATED: Path matches new dvc.yaml structure
+metadata_PATH = Path("data/versions/dataset_manifest.json") 
 CHUNKS_DIR = Path("data/processed/chunks")
-
 
 def compute_dataset_hash() -> str:
     h = hashlib.sha256()
+    
+    if not CHUNKS_DIR.exists():
+        print(f"ERROR: Chunks directory not found at {CHUNKS_DIR}")
+        sys.exit(1)
 
-    for chunk_file in sorted(CHUNKS_DIR.glob("*.json")):
+    chunk_files = sorted(CHUNKS_DIR.glob("*.json"))
+    if not chunk_files:
+        print(f"WARNING: No chunk files found in {CHUNKS_DIR}")
+
+    for chunk_file in chunk_files:
         with chunk_file.open("r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -41,13 +38,12 @@ def compute_dataset_hash() -> str:
                 for sec in data["sections"]
             ],
         }
-        # Use centralized deterministic bytes
         h.update(get_deterministic_json_bytes(payload))
 
     return h.hexdigest()
 
-
 def write_dataset_metadata():
+    print(f"Computing hash from: {CHUNKS_DIR}")
     dataset_hash = compute_dataset_hash()
 
     metadata = {
@@ -71,9 +67,8 @@ def write_dataset_metadata():
     with metadata_PATH.open("w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    print("Dataset metadata Written")
-    print("Dataset hash: ", metadata["dataset_hash"])
-
+    print(f"✅ Manifest Written: {metadata_PATH}")
+    print(f"   Hash: {metadata['dataset_hash']}")
 
 if __name__ == "__main__":
     write_dataset_metadata()

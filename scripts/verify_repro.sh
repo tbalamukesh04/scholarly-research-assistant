@@ -1,69 +1,74 @@
-#!/bin/bash
-set -e
+import sys
+import json
+import subprocess
+from pathlib import Path
 
-# ==============================================================================
-# verify_repro.sh
-# Purpose: Enforce lineage, artifact existence, and pipeline determinism.
-# Usage: ./scripts/verify_repro.sh
-# ==============================================================================
+# ANSI Colors for Windows Terminal
+GREEN = '\033[92m'
+RED = '\033[91m'
+NC = '\033[0m'
 
-# ANSI Colors
-GREEN='\\033[0;32m'
-RED='\\033[0;31m'
-NC='\\033[0m' # No Color
+DATASET_META = Path("data/versions/dataset_manifest.json")
+INDEX_MANIFEST = Path("data/processed/faiss/index_manifest.json")
 
-echo "Starting Reproducibility Verification..."
+def print_status(msg, status="INFO"):
+    if status == "PASS":
+        print(f"{GREEN}[PASS] {msg}{NC}")
+    elif status == "FAIL":
+        print(f"{RED}[FAIL] {msg}{NC}")
+    else:
+        print(f"[INFO] {msg}")
 
-# ------------------------------------------------------------------------------
-# 1. Lineage & Artifact Verification
-# ------------------------------------------------------------------------------
-echo "[1/3] Verifying Artifact Lineage..."
+def verify_lineage():
+    print_status("Verifying Artifact Lineage...")
+    
+    # Check Dataset Metadata
+    if not DATASET_META.exists():
+        print_status(f"Dataset manifest missing: {DATASET_META}", "FAIL")
+        return False
+    
+    with open(DATASET_META, "r") as f:
+        d_meta = json.load(f)
+        if "dataset_hash" not in d_meta:
+             print_status("dataset_hash missing in manifest", "FAIL")
+             return False
+    
+    # Check Index Manifest
+    if not INDEX_MANIFEST.exists():
+        print_status(f"Index manifest missing: {INDEX_MANIFEST}", "FAIL")
+        return False
 
-DATASET_META="data/versions/dataset_metadata.json"
-INDEX_MANIFEST="data/indexes/index_manifest.json"
+    with open(INDEX_MANIFEST, "r") as f:
+        i_meta = json.load(f)
+        if "artifact_hash" not in i_meta:
+            print_status("artifact_hash missing in index manifest", "FAIL")
+            return False
 
-# Check Dataset Metadata
-if [ ! -f "$DATASET_META" ]; then
-    echo -e "${RED}FAIL: Dataset metadata file missing ($DATASET_META).${NC}"
-    exit 1
-fi
+    print_status("Lineage hashes verified.", "PASS")
+    return True
 
-if ! grep -q '"dataset_hash":' "$DATASET_META"; then
-    echo -e "${RED}FAIL: 'dataset_hash' key missing in $DATASET_META.${NC}"
-    exit 1
-fi
+def verify_determinism():
+    print_status("Verifying Determinism...")
+    try:
+        # call the existing python check script
+        subprocess.check_call([sys.executable, "scripts/check_determinism.py"])
+        print_status("Determinism Verified.", "PASS")
+        return True
+    except subprocess.CalledProcessError:
+        print_status("Determinism Check Failed.", "FAIL")
+        return False
 
-# Check Index Manifest
-if [ ! -f "$INDEX_MANIFEST" ]; then
-    echo -e "${RED}FAIL: Index manifest file missing ($INDEX_MANIFEST).${NC}"
-    exit 1
-fi
+def main():
+    print(">>> STARTING REPRODUCIBILITY VERIFICATION (PYTHON) <<<")
+    
+    if not verify_lineage():
+        sys.exit(1)
+        
+    if not verify_determinism():
+        sys.exit(1)
+        
+    print(f"\n{GREEN}>>> REPRODUCIBILITY VERIFICATION COMPLETE <<<{NC}")
+    sys.exit(0)
 
-if ! grep -q '"artifact_hash":' "$INDEX_MANIFEST"; then
-    echo -e "${RED}FAIL: 'artifact_hash' key missing in $INDEX_MANIFEST.${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}Lineage artifacts and hashes verified.${NC}"
-
-# ------------------------------------------------------------------------------
-# 2. Determinism Verification
-# ------------------------------------------------------------------------------
-echo "[2/3] Verifying Pipeline Determinism..."
-
-if python scripts/check_determinism.py; then
-    echo -e "${GREEN}Determinism Verified.${NC}"
-else
-    echo -e "${RED}Determinism Check FAILED.${NC}"
-    exit 1
-fi
-
-# ------------------------------------------------------------------------------
-# 3. Guardrail Integrity
-# ------------------------------------------------------------------------------
-echo "[3/3] Verifying Guardrail Integrity..."
-# Note: Determinism check covers basic guardrail stability (refusal/confidence consistency).
-echo -e "${GREEN}Guardrail checks passed.${NC}"
-
-echo -e "\\n${GREEN}>>> REPRODUCIBILITY VERIFICATION COMPLETE <<<${NC}"
-exit 0
+if __name__ == "__main__":
+    main()

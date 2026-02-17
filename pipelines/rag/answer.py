@@ -31,7 +31,7 @@ class LLM:
                 model="gemini-2.5-flash-lite", 
                 contents=prompt,
                 config={
-                    "temperature": 0.2,
+                    "temperature": 0.0, 
                     "max_output_tokens": 1024,
                 },
             )
@@ -41,10 +41,6 @@ class LLM:
 
 
 def log_rag_run(query, answer, citations, dataset_hash, metrics):
-    """
-    Logs the RAG query execution to MLflow via MLflowHandler.
-    Now adheres to Strict Schema with real lineage data.
-    """
     tags = {
         "dataset_hash": dataset_hash,
         "query": query,
@@ -52,11 +48,9 @@ def log_rag_run(query, answer, citations, dataset_hash, metrics):
         "prompt_version": PROMPT_VERSION,
         "guardrail_version": GUARDRAIL_VERSION,
         "git_commit": get_git_commit(),
-        "run_type": RunType.GUARDRAIL.value # Explicitly set for tag validation
+        "run_type": RunType.GUARDRAIL.value 
     }
     
-    # We use RunType.GUARDRAIL as the primary type for RAG answers 
-    # because it includes refusal/confidence checks.
     with MLflowHandler.start_run(
         run_name="rag_query", 
         run_type=RunType.GUARDRAIL, 
@@ -67,9 +61,6 @@ def log_rag_run(query, answer, citations, dataset_hash, metrics):
 
 
 def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None):
-    """
-    Constructs the refusal response and logs it to MLflow.
-    """
     metrics = {
         "retrieval_latency": 0.0,
         "llm_latency": 0.0,
@@ -84,10 +75,6 @@ def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None
     if prior_metrics:
         metrics.update(prior_metrics)
         metrics["refusal_triggered"] = 1.0
-
-    # Ensure refusal reason is available for inspection (logged as param if needed, but not metric)
-    # Note: MLflowHandler tags handle the schema, we can add ad-hoc params if we want,
-    # but for now we stick to the required tags.
     
     log_rag_run(query, "REFUSAL", [], dataset_hash, metrics)
 
@@ -114,8 +101,8 @@ def adapt_for_rag(results, query):
             {
                 "paper_id": r["paper_id"],
                 "chunk_id": r["chunk_id"],
-                "section": r["chunk_id"].split("::")[2],
-                "order": int(r["chunk_id"].split("::chunk::")[1]),
+                "section": r["chunk_id"].split("::")[2] if "::" in r["chunk_id"] else "unknown",
+                "order": int(r["chunk_id"].split("::chunk::")[1]) if "::chunk::" in r["chunk_id"] else 0,
                 "text": None,
             }
             for r in results
@@ -142,7 +129,6 @@ def answer(
     checker = HallucinationChecker() 
     current_dataset_hash = compute_dataset_hash()
         
-    # --- 1. RETRIEVE & HYDRATE ---
     t0_retrieval = time.time()
     raw = retriever.search(query)
     retrieved_ids = [r["paper_id"] for r in raw.get("results", [])]
@@ -155,6 +141,16 @@ def answer(
     
     base_metrics = {"retrieval_latency": retrieval_latency}
     
+    # FIX: Initialize metrics BEFORE the loop to prevent UnboundLocalError
+    metrics = base_metrics.copy()
+    metrics.update({
+        "llm_latency": 0.0, 
+        "refusal_triggered": 0.0, 
+        "num_total_sentences": 0, 
+        "confidence_score": 0.0,
+        "num_supported_sentences": 0
+    })
+
     should_refuse, reason = check_refusal(
         retrieved_chunks=evidence,
         alignment_details=[], 
@@ -166,7 +162,6 @@ def answer(
     if should_refuse and not evidence:
          return _construct_refusal(query, evidence, reason, current_dataset_hash, base_metrics)
 
-    # --- PROMPT PREP ---
     evidence_text = format_evidence(evidence)
     system_prompt = f"""
     You are a scholarly assistant.
@@ -181,7 +176,7 @@ def answer(
     {evidence_text}
     """
 
-    MAX_RETRIES = 1
+    MAX_RETRIES = 3 
     attempt = 0
     current_prompt = f"{system_prompt}\n\nQuestion:\n{query}"
     
@@ -191,11 +186,17 @@ def answer(
     while attempt < MAX_RETRIES:
         log_event(logger=logger, level=logging.INFO, message=f"Generation Attempt {attempt + 1}")
         
-        # --- 2. GENERATE ---
         response = llm.generate(current_prompt)
         
+        if not response:
+            log_event(logger=logger, level=logging.WARNING, message=f"Attempt {attempt + 1} failed: Empty Response")
+            attempt += 1
+            time.sleep(1)
+            continue
+
         current_errors = []
         
+        # Reset specific metrics for this attempt, keeping retrieval info
         metrics = base_metrics.copy()
         metrics.update({
             "llm_latency": 0.0, 
@@ -205,23 +206,19 @@ def answer(
             "num_supported_sentences": 0
         })
 
-        # --- 3. SYNTAX CHECK ---
         syntax_result = checker.run_checks(response, evidence)
                 
         if not syntax_result["verification_passed"]:
              current_errors.extend(syntax_result["errors"])
         else:
-            # --- 4. ATTRIBUTION (ALIGN) ---
             sentences = split_into_sentences(response)
             attr_result = attributor.verify(sentences, evidence, threshold=0.2)
             
-            # --- 5. TRUNCATE ---
             truncated_details = apply_strict_truncation(attr_result["details"])
             
             metrics["num_total_sentences"] = len(truncated_details)
             metrics["num_supported_sentences"] = len([d for d in truncated_details if d["verification_status"] == "supported"])
             
-            # --- 6. CONFIDENCE SCORING ---
             scorer = ConfidenceScorer()    
             conf_metrics = scorer.calculate(
                 alignment_details = attr_result["details"],
@@ -229,17 +226,14 @@ def answer(
                 relevant_papers=relevant_papers if relevant_papers is not None else [], 
                 k = top_k
             )
-            # Filter metrics to only those allowed by schema (or rely on update overriding)
-            # The schema validator will catch if scorer returns something wild.
             metrics.update(conf_metrics)
 
-            # --- 7. REFUSAL CHECK (FINAL AUTHORITY) ---
             should_refuse, reason = check_refusal(
                 retrieved_chunks=evidence,
                 alignment_details=attr_result["details"], 
                 confidence_score=metrics.get("confidence_score", 0.0),
                 confidence_threshold=confidence_threshold,
-                citation_precision=1.0, 
+                citation_precision=metrics.get("citation_precision", 1.0),
                 min_distinct_papers=k_min
             )
 
@@ -247,9 +241,7 @@ def answer(
                 return _construct_refusal(query, evidence, reason, current_dataset_hash, metrics)
 
         if not current_errors:
-            # --- SUCCESS ---
             metrics["llm_latency"] = time.time() - t0_llm
-            
             final_response = reconstruct_final_answer(truncated_details)
             
             real_citations = []

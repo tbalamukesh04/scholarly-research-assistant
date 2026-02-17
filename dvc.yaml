@@ -13,30 +13,30 @@ stages:
       - data/raw
 
   process:
-    cmd: python -m pipelines.processing.extracting_and_chunking_pdfs --input_dir data/raw/pdfs --output_dir data/chunks
+    cmd: python -m pipelines.processing.extracting_and_chunking_pdfs --input_dir data/raw/pdfs --output_dir data/processed/chunks
     deps:
       - pipelines/processing/extracting_and_chunking_pdfs.py
       - data/raw
     params:
       - processing
     outs:
-      - data/chunks
+      - data/processed/chunks
 
   embed:
-    cmd: python -m pipelines.processing.build_embeddings_and_faiss --input_dir data/chunks --output_dir data/indexes
+    cmd: python -m pipelines.processing.build_embeddings_and_faiss --input_dir data/processed/chunks --output_dir data/processed/faiss
     deps:
       - pipelines/processing/build_embeddings_and_faiss.py
-      - data/chunks
+      - data/processed/chunks
     params:
       - indexing
     outs:
-      - data/indexes
+      - data/processed/faiss
 
   evaluate:
     cmd: python -m evaluation.evaluate
     deps:
       - evaluation/evaluate.py
-      - data/indexes
+      - data/processed/faiss
       - pipelines/evaluation/data/eval_queries.json
     params:
       - evaluation
