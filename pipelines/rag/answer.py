@@ -5,7 +5,7 @@ from typing import List, Optional, Dict, Any
 import time
 
 from utils.mlflow_handler import MLflowHandler 
-from utils.mlflow_schema import RunType 
+from utils.mlflow_schema import RunType, ALLOWED_METRICS
 from utils.metadata import get_git_commit, get_index_hash, PROMPT_VERSION, GUARDRAIL_VERSION
 
 from google import genai
@@ -51,13 +51,26 @@ def log_rag_run(query, answer, citations, dataset_hash, metrics):
         "run_type": RunType.GUARDRAIL.value 
     }
     
+    # FILTER METRICS TO COMPLY WITH SCHEMA
+    allowed_keys = ALLOWED_METRICS[RunType.GUARDRAIL]
+    filtered_metrics = {k: v for k, v in metrics.items() if k in allowed_keys}
+    
     with MLflowHandler.start_run(
         run_name="rag_query", 
         run_type=RunType.GUARDRAIL, 
         tags=tags, 
         nested=True
-    ):
-        MLflowHandler.log_metrics(RunType.GUARDRAIL, metrics)
+    ) as run:
+        # Log only the allowed numerical metrics
+        MLflowHandler.log_metrics(RunType.GUARDRAIL, filtered_metrics)
+        
+        # Log refusal reason as a param if present
+        if metrics.get("refusal_reason"):
+             MLflowHandler.log_params({"refusal_reason": metrics["refusal_reason"]})
+
+        if hasattr(run, "info"):
+            return run.info.run_id
+        return None
 
 
 def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None):
@@ -69,44 +82,62 @@ def _construct_refusal(query, evidence, reason, dataset_hash, prior_metrics=None
         "confidence_score": 0.0, 
         "alignment_score": 0.0,
         "recall_score": 0.0,
-        "num_supported_sentences": 0
+        "num_supported_sentences": 0,
+        "retrieved_chunks": len(evidence) if evidence else 0,
+        "refusal_reason": reason
     }
     
     if prior_metrics:
         metrics.update(prior_metrics)
         metrics["refusal_triggered"] = 1.0
+        metrics["refusal_reason"] = reason
     
-    log_rag_run(query, "REFUSAL", [], dataset_hash, metrics)
+    run_id = log_rag_run(query, "REFUSAL", [], dataset_hash, metrics)
 
     return {
         "query": query,
-        "answer": "I cannot answer this reliably with the available evidence (Refusal Triggered).",
-        "evidence": evidence,
+        "answer": None,
+        "answer_sentences": [],
         "citations": [],
-        "metrics": metrics
+        "metrics": metrics,
+        "run_id": run_id,
+        "index_hash": get_index_hash()
     }
 
 
 def format_evidence(evidence: List[dict]) -> str:
     blocks = []
     for i, e in enumerate(evidence):
-        blocks.append(f"[{i+1}] {e['text']}")
+        text = e.get('text', '') or ""
+        blocks.append(f"[{i+1}] {text}")
     return "\n\n".join(blocks)
 
 
 def adapt_for_rag(results, query):
+    adapted = []
+    for r in results:
+        chunk_id = r.get("chunk_id", "")
+        parts = chunk_id.split("::")
+        section = parts[2] if len(parts) > 2 else "unknown"
+        
+        order = 0
+        if "::chunk::" in chunk_id:
+            try:
+                order = int(chunk_id.split("::chunk::")[1])
+            except (IndexError, ValueError):
+                order = 0
+                
+        adapted.append({
+            "paper_id": r.get("paper_id", "unknown"),
+            "chunk_id": chunk_id,
+            "section": section,
+            "order": order,
+            "text": None, 
+        })
+        
     return {
         "query": query,
-        "results": [
-            {
-                "paper_id": r["paper_id"],
-                "chunk_id": r["chunk_id"],
-                "section": r["chunk_id"].split("::")[2] if "::" in r["chunk_id"] else "unknown",
-                "order": int(r["chunk_id"].split("::chunk::")[1]) if "::chunk::" in r["chunk_id"] else 0,
-                "text": None,
-            }
-            for r in results
-        ],
+        "results": adapted
     }
 
 
@@ -128,12 +159,13 @@ def answer(
     attributor = Attributor(retriever.model)
     checker = HallucinationChecker() 
     current_dataset_hash = compute_dataset_hash()
+    current_index_hash = get_index_hash()
         
     t0_retrieval = time.time()
     raw = retriever.search(query)
     retrieved_ids = [r["paper_id"] for r in raw.get("results", [])]
     
-    retrieved = adapt_for_rag(raw["results"], query)
+    retrieved = adapt_for_rag(raw.get("results", []), query)
     hydrated = attach_text(retrieved)
     evidence = hydrated["results"]
     t1_retrieval = time.time()
@@ -141,14 +173,14 @@ def answer(
     
     base_metrics = {"retrieval_latency": retrieval_latency}
     
-    # FIX: Initialize metrics BEFORE the loop to prevent UnboundLocalError
     metrics = base_metrics.copy()
     metrics.update({
         "llm_latency": 0.0, 
         "refusal_triggered": 0.0, 
         "num_total_sentences": 0, 
         "confidence_score": 0.0,
-        "num_supported_sentences": 0
+        "num_supported_sentences": 0,
+        "retrieved_chunks": len(evidence)
     })
 
     should_refuse, reason = check_refusal(
@@ -196,14 +228,14 @@ def answer(
 
         current_errors = []
         
-        # Reset specific metrics for this attempt, keeping retrieval info
         metrics = base_metrics.copy()
         metrics.update({
             "llm_latency": 0.0, 
             "refusal_triggered": 0.0, 
             "num_total_sentences": 0, 
             "confidence_score": 0.0,
-            "num_supported_sentences": 0
+            "num_supported_sentences": 0,
+            "retrieved_chunks": len(evidence)
         })
 
         syntax_result = checker.run_checks(response, evidence)
@@ -236,30 +268,66 @@ def answer(
                 citation_precision=metrics.get("citation_precision", 1.0),
                 min_distinct_papers=k_min
             )
+            
+            if should_refuse:
+                 metrics["refusal_reason"] = reason
 
             if should_refuse:
                 return _construct_refusal(query, evidence, reason, current_dataset_hash, metrics)
 
         if not current_errors:
             metrics["llm_latency"] = time.time() - t0_llm
-            final_response = reconstruct_final_answer(truncated_details)
+            final_response_text = reconstruct_final_answer(truncated_details)
             
-            real_citations = []
-            for idx in syntax_result["cited_indices"]:
-                if 1 <= idx <= len(evidence):
-                    e = evidence[idx - 1] 
-                    real_citations.append(f"{e['paper_id']}:{e['section']}:{e['chunk_id']}")
-
-            if mode == "synthesis" and not final_response.strip().lower().startswith("synthesis"):
-                final_response = "SYNTHESIS: " + final_response
+            final_sentences = []
+            used_citations_map = {} 
+            next_citation_id = 1
             
-            log_rag_run(query, final_response, real_citations, current_dataset_hash, metrics)
+            for det in truncated_details:
+                c_indices = []
+                if det["verification_status"] == "supported" and det["supported_by_chunk_index"] is not None:
+                    idx = det["supported_by_chunk_index"]
+                    if 0 <= idx < len(evidence):
+                        if idx not in used_citations_map:
+                             chunk = evidence[idx]
+                             safe_text = chunk.get("text") or ""
+                             
+                             used_citations_map[idx] = {
+                                 "citation_id": next_citation_id,
+                                 "paper_id": chunk["paper_id"],
+                                 "section": chunk["section"],
+                                 "text": safe_text,
+                                 "score": float(det["max_score"])
+                             }
+                             next_citation_id += 1
+                        else:
+                            if float(det["max_score"]) > used_citations_map[idx]["score"]:
+                                 used_citations_map[idx]["score"] = float(det["max_score"])
+                        
+                        c_indices.append(used_citations_map[idx]["citation_id"])
+                
+                final_sentences.append({
+                    "text": det["sentence"],
+                    "verification_status": det["verification_status"],
+                    "citation_indices": c_indices
+                })
+            
+            final_citations = sorted(used_citations_map.values(), key=lambda x: x["citation_id"])
+            
+            if mode == "synthesis" and not final_response_text.strip().lower().startswith("synthesis"):
+                final_response_text = "SYNTHESIS: " + final_response_text
+            
+            audit_citations = [f"{c['paper_id']}:{c['section']}:{c['citation_id']}" for c in final_citations]
+            run_id = log_rag_run(query, final_response_text, audit_citations, current_dataset_hash, metrics)
             
             return {
                 "query": query,
-                "answer": final_response,
-                "citations": real_citations, 
-                'metrics': metrics
+                "answer": final_response_text,
+                "answer_sentences": final_sentences,
+                "citations": final_citations, 
+                'metrics': metrics,
+                "run_id": run_id,
+                "index_hash": current_index_hash
             }
         
         error_msg = "; ".join(current_errors)
@@ -268,18 +336,3 @@ def answer(
         attempt += 1
 
     return _construct_refusal(query, evidence, "Max Retries Failed", current_dataset_hash, metrics)
-
-if __name__ == "__main__":
-    with open(r"pipelines\evaluation\data\eval_queries.json", encoding="utf-8") as f:
-        input = json.load(f)
-    
-    query = input[2]["query"]
-    relevant_papers = input[2]["relevant_papers"]
-    print("--- EVAL MODE ---")
-    results = answer(
-        query, 
-        eval_mode=True, 
-        relevant_papers=relevant_papers,
-        confidence_threshold=0.8 
-    )
-    print(json.dumps(results, indent=2))

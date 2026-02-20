@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from app.dependencies import get_dataset_hash, get_retriever, load_state
-from app.schemas import Citation, QueryRequest, QueryResponse, QueryMetrics
+from app.schemas import Citation, QueryRequest, QueryResponse, QueryMetrics, AnswerSentence
 from pipelines.rag.answer import answer 
 from app.metrics import RequestMetrics
 from utils.logging import log_event, logging, setup_logger
@@ -59,21 +59,16 @@ def query(
         )
         
         total_time = metrics_tracker.total_time()
-        # Determine if answer exists
+        
         ans_text = result.get("answer")
         raw_citations = result.get("citations", [])
-
-        formatted_citations = []
-        for c in raw_citations:
-            parts = str(c).split(":")
-            formatted_citations.append(
-                Citation(
-                    paper_id=parts[0] if len(parts) > 0 else "unknown",
-                    chunk_id=str(c),
-                    section=parts[1] if len(parts) > 1 else "unknown",
-                    score=0.0,
-                )
-            )
+        raw_sentences = result.get("answer_sentences", [])
+        
+        # Convert dictionary citations to Pydantic models
+        formatted_citations = [Citation(**c) for c in raw_citations]
+        
+        # Convert dictionary sentences to Pydantic models
+        formatted_sentences = [AnswerSentence(**s) for s in raw_sentences]
         
         duration = time.time() - start_time
         
@@ -85,32 +80,36 @@ def query(
                     citation_count=len(formatted_citations),
                     has_answer=ans_text is not None,
                 )
-                
+        
+        # Extract metrics
+        res_metrics = result.get("metrics", {})
+        
         queryMetrics = QueryMetrics(
+            refused = res_metrics.get("refusal_triggered", 0.0) > 0.5,
+            refusal_reason = res_metrics.get("refusal_reason"),
+            confidence_score = res_metrics.get("confidence_score", 0.0),
             total_latency = total_time, 
-            retrieval_latency = result.get("metrics", {}).get("retrieval_latency", 0.0),
-            llm_latency = result.get("metrics", {}).get("llm_latency", 0.0), 
-            retrieved_chunks = result.get("metrics", {}).get("retrieved_chunks", 0),
-            refused = 1 if result.get("metrics", {}).get("refused", False) else 0,
-            refusal_reason = result.get("metrics", {}).get("refusal_reason"),
-            confidence_score = result.get("metrics", {}).get("confidence_score", 0.0), 
-            truncated = result.get("metrics", {}).get(f"truncated", False), 
-            dropped_sentences = result.get("metrics", {}).get("unaligned_sentences", 0)
+            retrieval_latency = res_metrics.get("retrieval_latency", 0.0),
+            llm_latency = res_metrics.get("llm_latency", 0.0), 
+            retrieved_chunks = res_metrics.get("retrieved_chunks", 0),
+            truncated = res_metrics.get("truncated", False), 
+            dropped_sentences = res_metrics.get("unaligned_sentences", 0)
         )
 
         return QueryResponse(
             query=req.query,
             answer=ans_text,
+            answer_sentences=formatted_sentences,
             citations=formatted_citations,
-            retrieval_only=ans_text is None,
             dataset_hash=dataset_hash,
+            index_hash=result.get("index_hash"),
+            run_id=result.get("run_id"),
             metrics = queryMetrics
         )
 
     except Exception as e:
-        # Print full stack trace to terminal
         import traceback
-        traceback.print_exc()  # Keep terminal output for immediate dev visibility
+        traceback.print_exc() 
         log_event(
             server_logger,
             logging.ERROR,

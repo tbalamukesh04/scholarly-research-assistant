@@ -68,5 +68,12 @@ class MLflowHandler:
         mlflow.log_metrics(metrics)
 
     @staticmethod
+    def log_params(params: Dict[str, Any]):
+        """
+        Logs parameters to MLflow.
+        """
+        mlflow.log_params(params)
+
+    @staticmethod
     def log_artifact(local_path: str):
         mlflow.log_artifact(local_path)

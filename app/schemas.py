@@ -7,29 +7,36 @@ class QueryRequest(BaseModel):
     mode: Literal["strict", "exploratory"] = "strict"
     eval_mode: bool = False
     relevant_papers: Optional[List[str]] = None
-    
+
 class Citation(BaseModel):
+    citation_id: int
     paper_id: str
-    chunk_id: str 
-    section: str 
+    section: str
+    text: str
     score: float
-    
+
+class AnswerSentence(BaseModel):
+    text: str
+    verification_status: Literal["supported", "unsupported"]
+    citation_indices: List[int]
+
 class QueryMetrics(BaseModel):
+    refused: bool
+    refusal_reason: Optional[str] = None
+    confidence_score: float = 0.0
     total_latency: float
     retrieval_latency: float
     llm_latency: float
-    retrieved_chunks: int
-    refused: int
-    refusal_reason: Optional[str] = None
-    confidence_score: float = 0.0
+    retrieved_chunks: int = 0
     truncated: bool = False
     dropped_sentences: int = 0
-    
+
 class QueryResponse(BaseModel):
     query: str
-    answer: Optional[str]
-    citations: List[Citation]
-    retrieval_only: bool
+    answer: Optional[str] = None
+    answer_sentences: List[AnswerSentence] = []
+    citations: List[Citation] = []
     dataset_hash: str
+    index_hash: Optional[str] = None
+    run_id: Optional[str] = None
     metrics: QueryMetrics
-    
